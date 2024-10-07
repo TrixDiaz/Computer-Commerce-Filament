@@ -15,4 +15,11 @@ Route::view('profile', 'profile')
 Route::view('catalog', 'catalog')
     ->name('catalog');
 
+Route::view('cart', 'cart')
+    ->name('cart');
+
+Route::view('payment', 'payment')
+    ->middleware(['auth', 'verified'])
+    ->name('payment');
+
 require __DIR__ . '/auth.php';

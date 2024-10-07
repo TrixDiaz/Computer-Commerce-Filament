@@ -26,5 +26,8 @@
                 {{ $slot }}
             </div>
         </div>
+
+        <!-- Flowbite -->
+        <script src="{{ asset('js/flowbite.min.js') }}"></script>
     </body>
 </html>

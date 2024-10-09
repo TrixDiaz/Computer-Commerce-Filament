@@ -50,6 +50,9 @@
     <!-- Heading -->
     <livewire:heading />
 
+    <!-- Carousel Product -->
+    <livewire:carousel-product />
+
     <!-- Promo -->
     <livewire:promo />
 

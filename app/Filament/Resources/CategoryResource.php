@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryResource extends Resource
 {
+    protected static ?string $navigationGroup = 'Product Attributes';
+    
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -45,13 +47,6 @@ class CategoryResource extends Resource
                             ->maxLength(255)
                             ->unique(Category::class, 'slug', ignoreRecord: true),
                     ]),
-                    Forms\Components\MarkdownEditor::make('description')
-                        ->label('Description')
-                        ->columnSpan(2),
-                    Forms\Components\FileUpload::make('image')
-                        ->label('Attachment')
-                        ->image()
-                        ->columnSpan(2),
                 ])->columnSpan([
                     'sm' => 3,
                     'md' => 3,
@@ -63,7 +58,8 @@ class CategoryResource extends Resource
                         Forms\Components\Toggle::make('is_active')
                             ->onIcon('heroicon-s-eye')
                             ->offIcon('heroicon-s-eye-slash')
-                            ->label('Visible'),
+                            ->label('Visible')
+                            ->default(true),
 
                     ]),
                     Forms\Components\Section::make()->schema([
@@ -185,9 +181,12 @@ class CategoryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('parent_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Active')
+                    ->onIcon('heroicon-m-bolt')
+                    ->offIcon('heroicon-m-bolt-slash')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

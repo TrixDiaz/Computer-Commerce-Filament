@@ -12,8 +12,7 @@ class Brand extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
-        'logo',
+        'is_active',
     ];
 
     public function categories()

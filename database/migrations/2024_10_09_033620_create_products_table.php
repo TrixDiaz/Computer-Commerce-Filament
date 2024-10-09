@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
+            $table->unsignedBigInteger('brand_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
@@ -19,8 +21,8 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->integer('stock_quantity');
             $table->string('sku')->unique();
-            $table->foreignId('brand_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('SET NULL');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('SET NULL');
             $table->boolean('is_active')->default(true);
             $table->json('images')->nullable();
             $table->timestamps();

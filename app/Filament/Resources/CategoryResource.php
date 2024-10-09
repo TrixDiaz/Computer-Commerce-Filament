@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Filament\Resources\UserResource\Pages;
-use App\Models\User;
+use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,91 +13,65 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class CategoryResource extends Resource
 {
+    protected static ?string $model = Category::class;
 
-    protected static ?string $navigationGroup = 'Settings'; 
-
-    protected static ?string $navigationLabel = 'System Users';
-
-    protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-finger-print';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('User Information')
-                    ->schema([
-                        Forms\Components\Grid::make(2)->schema([
-                            Forms\Components\TextInput::make('first_name')
-                                ->required()
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('last_name')
-                                ->required()
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('email')
-                                ->email()
-                                ->required()
-                                ->maxLength(255),
-                            Forms\Components\DatePicker::make('email_verified_at')
-                                ->native(false)
-                                ->format('d/m/Y')
-                                ->timezone('Asia/Manila'),
-                            Forms\Components\TextInput::make('password')
-                                ->password()
-                                ->required()
-                                ->maxLength(255)
-                                ->default('password')
-                                ->prefix('password')
-                                ->dehydrated(fn($state) => filled($state))
-                                ->suffixAction(
-                                    Forms\Components\Actions\Action::make('togglePassword')
-                                        ->icon('heroicon-m-eye')
-                                        ->action(function (Forms\Components\TextInput $component, $livewire) {
-                                            $component->type($component->getType() === 'password' ? 'text' : 'password');
-                                            $livewire->dispatch('password-visibility-changed');
-                                        })
-                                )
-                                ->afterStateHydrated(function (Forms\Components\TextInput $component) {
-                                    $component->type('password');
-                                }),
-                            Forms\Components\TextInput::make('phone')
-                                ->tel()
-                                ->maxLength(255)
-                                ->default(null),
-                            Forms\Components\DatePicker::make('date_of_birth')
-                                ->native(false)
-                                ->format('d/m/Y')
-                                ->timezone('Asia/Manila'),
-                            Forms\Components\Select::make('gender')
-                                ->native(false)
-                                ->options([
-                                    'male' => 'Male',
-                                    'female' => 'Female',
-                                    'other' => 'Other',
-                                ]),
-                        ])
-                    ])->columnSpan([
-                        'sm' => 3,
-                        'md' => 3,
-                        'lg' => 2
+                Forms\Components\Section::make()->schema([
+                    Forms\Components\Grid::make(2)->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->unique(Category::class, 'name', ignoreRecord: true)
+                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                                /*if ($operation !== 'create') {
+                                return;
+                            }*/
+
+                                $set('slug', \Illuminate\Support\Str::slug($state));
+                            }),
+
+                        Forms\Components\TextInput::make('slug')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Category::class, 'slug', ignoreRecord: true),
                     ]),
+                    Forms\Components\MarkdownEditor::make('description')
+                        ->label('Description')
+                        ->columnSpan(2),
+                    Forms\Components\FileUpload::make('image')
+                        ->label('Attachment')
+                        ->image()
+                        ->columnSpan(2),
+                ])->columnSpan([
+                    'sm' => 3,
+                    'md' => 3,
+                    'lg' => 2
+                ]),
 
                 Forms\Components\Grid::make(1)->schema([
-                    Forms\Components\Section::make('User Image')
-                        ->schema([
-                            Forms\Components\FileUpload::make('image')
-                                ->image(),
-                        ])->collapsible(),
+                    Forms\Components\Section::make('Visibility')->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->onIcon('heroicon-s-eye')
+                            ->offIcon('heroicon-s-eye-slash')
+                            ->label('Visible'),
 
+                    ]),
                     Forms\Components\Section::make()->schema([
                         Forms\Components\Placeholder::make('created_at')
                             ->label('Created at')
                             ->hiddenOn('create')
                             ->content(function (\Illuminate\Database\Eloquent\Model $record): String {
-                                $category = User::find($record->id);
+                                $category = Category::find($record->id);
                                 $now = \Carbon\Carbon::now();
 
                                 $diff = $category->created_at->diff($now);
@@ -147,7 +121,7 @@ class UserResource extends Resource
                         Forms\Components\Placeholder::make('updated_at')
                             ->label('Last modified at')
                             ->content(function (\Illuminate\Database\Eloquent\Model $record): String {
-                                $category = User::find($record->id);
+                                $category = Category::find($record->id);
                                 $now = \Carbon\Carbon::now();
 
                                 $diff = $category->updated_at->diff($now);
@@ -194,7 +168,7 @@ class UserResource extends Resource
                                     return 'just now';
                                 }
                             }),
-                    ])->hiddenOn('create'),
+                    ])->hiddenOn('create')
                 ])->columnSpan([
                     'sm' => 3,
                     'md' => 3,
@@ -209,24 +183,11 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('phone')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('date_of_birth')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('gender')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\ImageColumn::make('image')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('parent_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -268,9 +229,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListCategories::route('/'),
+            'create' => Pages\CreateCategory::route('/create'),
+            'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }

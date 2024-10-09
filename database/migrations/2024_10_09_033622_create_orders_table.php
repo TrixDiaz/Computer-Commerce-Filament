@@ -12,13 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('billing_address_id')->nullable();
+            $table->unsignedBigInteger('shipping_address_id')->nullable();
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('SET NULL');
             $table->string('order_number')->unique();
             $table->decimal('total_amount', 10, 2);
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
-            $table->foreignId('billing_address_id')->constrained('addresses');
-            $table->foreignId('shipping_address_id')->constrained('addresses');
+            $table->foreign('billing_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
+            $table->foreign('shipping_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

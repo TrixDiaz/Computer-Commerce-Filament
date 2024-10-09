@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('gender')->nullable();
             $table->string('image')->nullable();
+            $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
         });

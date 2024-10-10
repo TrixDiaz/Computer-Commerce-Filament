@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Product;
+use Ixudra\Curl\Facades\Curl;
+use Illuminate\Support\Facades\Session;
 
 class ProductProfile extends Component
 {
@@ -59,8 +61,49 @@ class ProductProfile extends Component
 
     public function payWithGCash($productId)
     {
-        // Implement GCash payment logic here
-        session()->flash('message', 'GCash payment functionality coming soon!');
+        $product = Product::findOrFail($productId);
+        $total = $product->price;
+
+        $data = [
+            'data' => [
+                'attributes' => [
+                    'line_items' => [
+                        [
+                            'currency' => 'PHP',
+                            'amount' => (int)($total * 100),
+                            'description' => "Payment for {$product->name}",
+                            'name' => $product->name,
+                            'quantity' => 1,
+                        ],
+                    ],
+                    'payment_method_types' => ['gcash'],
+                    'success_url' => route('payment.success'),
+                    'cancel_url' => route('payment.failed'),
+                    'description' => "Payment for {$product->name}",
+                ],
+            ],
+        ];
+        
+        $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
+            ->withHeader('Content-Type: application/json')
+            ->withHeader('accept: application/json')
+            ->withHeader('Authorization: Basic c2tfdGVzdF9ZS1lMMnhaZWVRRDZjZ1dYWkJYZ1dHVU46' . base64_encode(config('services.paymongo.secret_key')))
+            ->withData($data)
+            ->asJson()
+            ->post();
+
+        if (isset($response->data->attributes->checkout_url)) {
+            Session::put('session_id', $response->data->id);
+            Session::put('checkout_url', $response->data->attributes->checkout_url);
+            return redirect()->to($response->data->attributes->checkout_url);
+        } else {
+            $this->dispatch('swal:error', [
+                'title' => 'Error!',
+                'text' => 'Unable to process payment. Please try again later.',
+                'icon' => 'error',
+            ]);
+            return redirect()->route('payment.failed');
+        }
     }
 
     public function render()

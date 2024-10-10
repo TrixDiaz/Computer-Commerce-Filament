@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\ShoppingCart;
 
 Route::view('/', 'welcome')->name('home');
 
@@ -25,5 +26,8 @@ Route::view('payment', 'payment')
 Route::get('product-profile/{slug}', function ($slug) {
     return view('product-profile', ['slug' => $slug]);
 })->name('product-profile');
+
+Route::get('/payment/success', ShoppingCart::class . '@handlePaymentSuccess')->name('payment.success');
+Route::get('/payment/failed', ShoppingCart::class . '@handlePaymentFailed')->name('payment.failed');
 
 require __DIR__ . '/auth.php';

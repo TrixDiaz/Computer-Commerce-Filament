@@ -3,6 +3,9 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Ixudra\Curl\Facades\Curl;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class ShoppingCart extends Component
 {
@@ -79,6 +82,88 @@ class ShoppingCart extends Component
             'text' => 'Item removed from cart successfully!',
             'icon' => 'success',
             'timer' => 3000,
+        ]);
+    }
+
+    public function proceedToCheckout()
+    {
+        $total = $this->total; // Assuming $this->total holds the total price
+
+        $data = [
+            'data' => [
+                'attributes' => [
+                    'line_items' => [
+                        [
+                            'currency' => 'PHP',
+                            'amount' => (int)($total * 100), // Convert to cents and ensure it's an integer
+                            'description' => 'Payment for your order',
+                            'name' => 'Order Payment',
+                            'quantity' => 1,
+                        ],
+                    ],
+                    'payment_method_types' => ['gcash'],
+                    'success_url' => route('payment.success'),
+                    'cancel_url' => route('payment.failed'),
+                    'description' => 'Payment for your order',
+                ],
+            ],
+        ];
+        
+        $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
+            ->withHeader('Content-Type: application/json')
+            ->withHeader('accept: application/json')
+            ->withHeader('Authorization: Basic c2tfdGVzdF9ZS1lMMnhaZWVRRDZjZ1dYWkJYZ1dHVU46' . base64_encode(config('services.paymongo.secret_key')))
+            ->withData($data)
+            ->asJson()
+            ->post();
+
+        if (isset($response->data->attributes->checkout_url)) {
+            Session::put('session_id', $response->data->id);
+            Session::put('checkout_url', $response->data->attributes->checkout_url);
+            return redirect()->to($response->data->attributes->checkout_url);
+        } else {
+            // Handle error
+            $this->dispatch('swal:error', [
+                'title' => 'Error!',
+                'text' => 'Unable to process payment. Please try again later.',
+                'icon' => 'error',
+            ]);
+            return redirect()->route('payment.failed');
+        }
+    }
+
+    private function formatLineItems()
+    {
+        return array_map(function ($item) {
+            return [
+                'currency' => 'PHP',
+                'amount' => (int)($item['price'] * 100),
+                'name' => $item['name'],
+                'quantity' => $item['quantity'],
+            ];
+        }, $this->cartItems);
+    }
+
+    public function handlePaymentSuccess()
+    {
+        // Handle successful payment
+        $this->dispatch('swal:success', [
+            'title' => 'Success!',
+            'text' => 'Your payment was successful.',
+            'icon' => 'success',
+        ]);
+        // Clear the cart or perform any other necessary actions
+        $this->cartItems = [];
+        $this->total = 0;
+    }
+
+    public function handlePaymentFailed()
+    {
+        // Handle failed payment
+        $this->dispatch('swal:error', [
+            'title' => 'Payment Failed',
+            'text' => 'Your payment was not successful. Please try again.',
+            'icon' => 'error',
         ]);
     }
 }

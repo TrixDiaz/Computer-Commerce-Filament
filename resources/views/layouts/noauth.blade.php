@@ -16,9 +16,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
-    <div>
-        {{ $slot }}
+<body class="font-sans antialiased">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <livewire:navigation />
+        <div>
+            {{ $slot }}
+        </div>
+        <livewire:footer />
     </div>
     <!-- Flowbite -->
     <script src="{{ asset('js/flowbite.min.js') }}"></script>

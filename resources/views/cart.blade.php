@@ -1,5 +1,3 @@
 <x-noauth-layout>
-    <livewire:navigation />
-        <livewire:shopping-cart />
-    <livewire:footer />
+    <livewire:shopping-cart />
 </x-noauth-layout>

@@ -1,5 +1,7 @@
 <x-noauth-layout>
-    <livewire:navigation />
-      <livewire:product-profile />
-    <livewire:footer />
+  @if(isset($error))
+    <div class="text-red-500">{{ $error }}</div>
+  @else
+    <livewire:product-profile :slug="$slug" />
+  @endif
 </x-noauth-layout>

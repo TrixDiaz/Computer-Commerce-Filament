@@ -50,23 +50,58 @@ class ListProduct extends Component
         }
     }
 
+    public function sortBy($field)
+    {
+        if ($field === 'random') {
+            $this->sortBy = 'random';
+            // No need for sort direction when using random
+            $this->sortDirection = null;
+        } else {
+            if ($this->sortBy === $field) {
+                $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                $this->sortDirection = 'asc';
+            }
+            $this->sortBy = $field;
+        }
+    }
+
+    public function applyFilters()
+    {
+        // This method will be called when the "Apply Filters" button is clicked
+        // You can add any additional logic here if needed
+    }
+
     public function render()
     {
-        $products = Product::query()
-            ->when($this->search, fn($query) => $query->where('name', 'like', '%' . $this->search . '%'))
-            ->when($this->minPrice, fn($query) => $query->where('price', '>=', $this->minPrice))
-            ->when($this->maxPrice, fn($query) => $query->where('price', '<=', $this->maxPrice))
-            ->when($this->selectedBrands, fn($query) => $query->whereIn('brand', $this->selectedBrands))
-            ->when($this->selectedColors, fn($query) => $query->whereIn('color', $this->selectedColors))
-            ->when($this->selectedRating, fn($query) => $query->where('rating', '>=', $this->selectedRating));
+        $query = Product::query()
+            ->when($this->search, function ($query) {
+                return $query->where('name', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->minPrice, function ($query) {
+                return $query->where('price', '>=', $this->minPrice);
+            })
+            ->when($this->maxPrice, function ($query) {
+                return $query->where('price', '<=', $this->maxPrice);
+            })
+            ->when($this->selectedBrands, function ($query) {
+                return $query->whereIn('brand', $this->selectedBrands);
+            })
+            ->when($this->selectedColors, function ($query) {
+                return $query->whereIn('color', $this->selectedColors);
+            })
+            ->when($this->selectedRating, function ($query) {
+                return $query->where('rating', '>=', $this->selectedRating);
+            });
 
+        // Handle random sorting separately
         if ($this->sortBy === 'random') {
-            $products = $products->inRandomOrder();
+            $query->inRandomOrder();
         } else {
-            $products = $products->orderBy($this->sortBy, $this->sortDirection);
+            $query->orderBy($this->sortBy, $this->sortDirection);
         }
 
-        $products = $products->paginate($this->perPage);
+        $products = $query->paginate($this->perPage);
 
         return view('livewire.list-product', [
             'products' => $products,

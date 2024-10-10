@@ -22,4 +22,7 @@ Route::view('payment', 'payment')
     ->middleware(['auth', 'verified'])
     ->name('payment');
 
+Route::view('product-profile', 'product-profile')
+    ->name('product-profile');
+
 require __DIR__ . '/auth.php';

@@ -63,10 +63,23 @@
                 @foreach ($products as $product)
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <!-- Product card content -->
-                    <div class="h-56 w-full">
+                    <div class="h-56 w-full relative group">
                         <a href="#">
-                            <img class="mx-auto h-full dark:hidden" src="{{ $product->image }}" alt="{{ $product->name }}" />
-                            <img class="mx-auto hidden h-full dark:block" src="{{ $product->dark_image }}" alt="{{ $product->name }}" />
+                            <img 
+                                class="mx-auto h-full w-full object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0 dark:hidden" 
+                                src="{{ $product->image ?? '/images/laptop-image.png' }}" 
+                                alt="{{ $product->name }}" 
+                            />
+                            <img 
+                                class="mx-auto hidden h-full w-full object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0 dark:block" 
+                                src="{{ $product->dark_image ?? '/images/laptop-image.png' }}" 
+                                alt="{{ $product->name }}" 
+                            />
+                            <img 
+                                class="mx-auto h-full w-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100" 
+                                src="{{ $product->hover_image ?? '/images/hover-image.png' }}" 
+                                alt="{{ $product->name }} - Hover Image" 
+                            />
                         </a>
                     </div>
                     <div class="pt-6">

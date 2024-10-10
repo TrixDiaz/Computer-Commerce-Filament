@@ -8,17 +8,10 @@ use App\Models\Product;
 class ProductProfile extends Component
 {
     public $product;
-    public $slug;
-    public $error;
 
     public function mount($slug)
     {
-        $this->slug = $slug;
-        try {
-            $this->product = Product::where('slug', $slug)->firstOrFail();
-        } catch (\Exception $e) {
-            $this->error = "Product not found. Slug: " . $slug;
-        }
+        $this->product = Product::where('slug', $slug)->firstOrFail();
     }
 
     public function render()

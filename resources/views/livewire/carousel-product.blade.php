@@ -9,15 +9,15 @@
             <div class="w-full flex-shrink-0">
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 h-full">
                     @foreach($chunk as $index => $product)
-                    <div class="relative group {{ $index >= 2 ? 'hidden lg:block' : '' }}">
-                        <a href="{{ route('product-profile', ['slug' => $product->slug]) }}">
+                    <div class="relative group {{ $index >= 2 ? 'hidden lg:block' : '' }} flex justify-center items-center">
+                        <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="w-full h-full flex justify-center items-center">
                             @php
                                 $images = json_decode($product->image_url, true) ?? [];
                                 $defaultImage = count($images) > 0 ? $images[0] : 'images/laptop-image.png';
                                 $hoverImage = count($images) > 1 ? $images[array_rand($images, 1)] : 'images/hover-image.png';
                             @endphp
                             <img src="{{ $defaultImage }}" 
-                                 class="w-full h-full object-contain transition-opacity duration-300 ease-in-out"
+                                 class="max-w-full max-h-full object-contain transition-opacity duration-300 ease-in-out"
                                  alt="{{ $product->name }}"
                                  @mouseenter="$event.target.src = '{{ $hoverImage }}'"
                                  @mouseleave="$event.target.src = '{{ $defaultImage }}'">

@@ -1,5 +1,3 @@
 <x-noauth-layout>
-    <livewire:navigation />
-        <livewire:list-product />
-    <livewire:footer />
+    <livewire:list-product />
 </x-noauth-layout>

@@ -16,9 +16,15 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class TaxResource extends Resource
 {
     protected static ?string $navigationGroup = 'Other';
+    
     protected static ?string $model = Tax::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {

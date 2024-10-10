@@ -23,4 +23,6 @@ class Promotion extends Model
     {
         return $this->belongsToMany(Product::class, 'product_promotions');
     }
+
+    
 }

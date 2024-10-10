@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -29,6 +31,21 @@
 
     <!-- Flowbite -->
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
+
+    <!-- SweetAlert2 -->
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('swal:success', (data) => {
+                Swal.fire({
+                    title: data[0].title,
+                    text: data[0].text,
+                    icon: data[0].icon,
+                    timer: data[0].timer,
+                    showConfirmButton: false
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

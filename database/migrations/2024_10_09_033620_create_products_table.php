@@ -19,12 +19,20 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->decimal('price', 8, 2);
+            $table->decimal('original_price', 8, 2)->nullable();
             $table->integer('stock_quantity');
             $table->string('sku')->unique();
+            $table->json('images')->nullable();
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('SET NULL');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('SET NULL');
+            $table->boolean('is_featured')->default(false);
             $table->boolean('is_active')->default(true);
-            $table->json('images')->nullable();
+            $table->boolean('is_sale')->default(false);
+            $table->boolean('is_new')->default(false);
+            $table->boolean('is_best_seller')->default(false);
+            $table->boolean('is_top_rated')->default(false);
+            $table->boolean('is_on_sale')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

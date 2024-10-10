@@ -14,15 +14,30 @@ class Product extends Model
         'slug',
         'description',
         'price',
+        'original_price', // Add this line
         'stock_quantity',
         'sku',
         'is_active',
         'category_id',
         'brand_id',
+        'is_featured',
+        'is_active',
+        'is_sale',
+        'is_new',
+        'is_best_seller',
+        'is_top_rated',
+        'is_on_sale',
     ];
 
     protected $casts = [
         'images' => 'array',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+        'is_sale' => 'boolean',
+        'is_new' => 'boolean',
+        'is_best_seller' => 'boolean',
+        'is_top_rated' => 'boolean',
+        'is_on_sale' => 'boolean',
     ];
 
     public function category()
@@ -53,5 +68,11 @@ class Product extends Model
     public function promotions()
     {
         return $this->belongsToMany(Promotion::class, 'product_promotions');
+    }
+
+    // You might want to add this accessor
+    public function getOriginalPriceAttribute($value)
+    {
+        return $value ?? $this->price;
     }
 }

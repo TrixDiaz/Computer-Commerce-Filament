@@ -8,6 +8,8 @@ use Livewire\Component;
 use Ixudra\Curl\Facades\Curl;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderInvoice;
 
 class ShoppingCart extends Component
 {
@@ -265,9 +267,43 @@ class ShoppingCart extends Component
             'text' => 'Your payment was successful.',
             'icon' => 'success',
         ]);
+
+        // Send invoice email
+        $this->sendInvoiceEmail();
+
         // Clear the cart or perform any other necessary actions
         $this->cartItems = [];
         $this->total = 0;
+
+        return redirect()->back();
+    }
+
+    private function sendInvoiceEmail()
+    {
+        $user = auth()->user();
+        $selectedAddress = collect($this->addresses)->firstWhere('id', $this->selectedAddressId);
+
+        if (!$selectedAddress) {
+            Log::error('No shipping address found for order', [
+                'user_id' => $user->id,
+                'selected_address_id' => $this->selectedAddressId,
+            ]);
+            return;
+        }
+
+        $orderDetails = [
+            'items' => $this->cartItems,
+            'subtotal' => $this->subtotal,
+            'tax' => $this->tax,
+            'deliveryFee' => $this->deliveryFee,
+            'discount' => $this->discount,
+            'total' => $this->total,
+            'shippingAddress' => $selectedAddress,
+            'paymentMethod' => $this->paymentMethod,
+            'shippingOption' => $this->shippingOption,
+        ];
+
+        Mail::to($user->email)->send(new OrderInvoice($user, $orderDetails));
     }
 
     public function handlePaymentFailed()

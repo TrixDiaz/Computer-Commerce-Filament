@@ -15,6 +15,8 @@ class ShoppingCart extends Component
     public $tax = 0;
     public $deliveryFee = 0;
     public $relatedProducts = [];
+    public $paymentMethod = 'cod'; // Default to Cash on Delivery
+    public $shippingOption = 'normal'; // Default to Normal shipping
 
     public function mount()
     {
@@ -40,7 +42,7 @@ class ShoppingCart extends Component
         }, 0);
 
         $this->tax = $this->subtotal * 0.12; // Assuming 12% tax
-        $this->deliveryFee = 100; // Fixed delivery fee of 100
+        $this->deliveryFee = $this->shippingOption === 'rush' ? 100 : 0;
         $this->total = $this->subtotal + $this->tax + $this->deliveryFee;
     }
 
@@ -87,7 +89,34 @@ class ShoppingCart extends Component
 
     public function proceedToCheckout()
     {
-        $total = $this->total; // Assuming $this->total holds the total price
+        if ($this->paymentMethod === 'cod') {
+            // Handle Cash on Delivery checkout
+            $this->handleCashOnDeliveryCheckout();
+        } else {
+            // Handle GCash checkout
+            $this->handleGCashCheckout();
+        }
+    }
+
+    private function handleCashOnDeliveryCheckout()
+    {
+        // Implement Cash on Delivery logic here
+        // For example, save the order to the database and redirect to a confirmation page
+        $this->dispatch('swal:success', [
+            'title' => 'Order Placed!',
+            'text' => 'Your Cash on Delivery order has been placed successfully.',
+            'icon' => 'success',
+        ]);
+        // Clear the cart or perform any other necessary actions
+        $this->cartItems = [];
+        $this->total = 0;
+        // Redirect to a confirmation page
+        return redirect()->route('home');
+    }
+
+    private function handleGCashCheckout()
+    {
+        $total = $this->total;
 
         $data = [
             'data' => [
@@ -95,7 +124,7 @@ class ShoppingCart extends Component
                     'line_items' => [
                         [
                             'currency' => 'PHP',
-                            'amount' => (int)($total * 100), // Convert to cents and ensure it's an integer
+                            'amount' => (int)($total * 100),
                             'description' => 'Payment for your order',
                             'name' => 'Order Payment',
                             'quantity' => 1,
@@ -108,7 +137,7 @@ class ShoppingCart extends Component
                 ],
             ],
         ];
-        
+
         $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
             ->withHeader('Content-Type: application/json')
             ->withHeader('accept: application/json')
@@ -130,6 +159,17 @@ class ShoppingCart extends Component
             ]);
             return redirect()->route('payment.failed');
         }
+    }
+
+    public function updatePaymentMethod($method)
+    {
+        $this->paymentMethod = $method;
+    }
+
+    public function updateShippingOption($option)
+    {
+        $this->shippingOption = $option;
+        $this->calculateTotal();
     }
 
     private function formatLineItems()

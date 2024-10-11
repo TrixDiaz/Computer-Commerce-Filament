@@ -3,7 +3,9 @@
     total: @entangle('total'),
     subtotal: @entangle('subtotal'),
     tax: @entangle('tax'),
-    deliveryFee: @entangle('deliveryFee')
+    deliveryFee: @entangle('deliveryFee'),
+    paymentMethod: @entangle('paymentMethod'),
+    shippingOption: @entangle('shippingOption')
 }" wire:poll.5s="getUpdatedCart">
     <section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
         <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -104,6 +106,36 @@
                 <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
                     <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
                         <p class="text-xl font-semibold text-gray-900 dark:text-white">Order summary</p>
+
+                        <!-- Payment Method Selection -->
+                        <div class="mt-4">
+                            <p class="mb-2 text-base font-semibold text-gray-900 dark:text-white">Payment Method</p>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="paymentMethod" wire:change="updatePaymentMethod('cod')" value="cod" class="form-radio">
+                                    <span class="ml-2">Cash on Delivery</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="paymentMethod" wire:change="updatePaymentMethod('gcash')" value="gcash" class="form-radio">
+                                    <span class="ml-2">GCash</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Option Selection -->
+                        <div class="mt-4">
+                            <p class="mb-2 text-base font-semibold text-gray-900 dark:text-white">Shipping Option</p>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="shippingOption" wire:change="updateShippingOption('normal')" value="normal" class="form-radio">
+                                    <span class="ml-2">Normal Shipping (Free)</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="shippingOption" wire:change="updateShippingOption('rush')" value="rush" class="form-radio">
+                                    <span class="ml-2">Rush Shipping (₱100)</span>
+                                </label>
+                            </div>
+                        </div>
 
                         <div class="space-y-4">
                             <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">

@@ -52,7 +52,7 @@
                                     <div class="grid grid-cols-2">
                                         <div>
                                             <a href="#" class="truncate text-sm font-semibold leading-none text-gray-900 dark:text-white hover:underline">{{ $details['name'] }}</a>
-                                            <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">${{ number_format($details['price'], 2) }}</p>
+                                            <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">₱{{ number_format($details['price'], 2) }}</p>
                                         </div>
 
                                         <div class="flex items-center justify-end gap-6">

@@ -124,7 +124,7 @@ class ShoppingCart extends Component
             ->orWhere('brand_id', $brandId)
             ->whereNotIn('id', array_keys($this->cartItems))
             ->inRandomOrder()
-            ->limit(3)
+            ->limit(9)
             ->get()
             ->toArray();
     }

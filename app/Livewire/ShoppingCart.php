@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\Coupon;
+use Carbon\Carbon;
 use Livewire\Component;
 use Ixudra\Curl\Facades\Curl;
 use Illuminate\Support\Facades\Log;
@@ -15,8 +17,10 @@ class ShoppingCart extends Component
     public $tax = 0;
     public $deliveryFee = 0;
     public $relatedProducts = [];
-    public $paymentMethod = 'cod'; // Default to Cash on Delivery
-    public $shippingOption = 'normal'; // Default to Normal shipping
+    public $paymentMethod = 'cod';
+    public $shippingOption = 'normal';
+    public $couponCode;
+    public $discount = 0;
 
     public function mount()
     {
@@ -24,10 +28,48 @@ class ShoppingCart extends Component
         $this->fetchRelatedProducts();
     }
 
+    public function applyCoupon($couponCode)
+    {
+        $coupon = Coupon::where('code', $couponCode)->first();
+
+        if (!$coupon) {
+            $this->addError('coupon', 'Invalid coupon code.');
+            return;
+        }
+
+        $now = Carbon::now();
+        if ($now->lt($coupon->start_date) || $now->gt($coupon->end_date)) {
+            $this->addError('coupon', 'This coupon is not valid at this time.');
+            return;
+        }
+
+        if ($coupon->usage_limit <= $coupon->used_count) {
+            $this->addError('coupon', 'This coupon has reached its usage limit.');
+            return;
+        }
+
+        // Apply the discount
+        if ($coupon->type === 'fixed') {
+            $this->discount = $coupon->value;
+        } else { // percentage
+            $this->discount = $this->subtotal * ($coupon->value / 100);
+        }
+
+        // Update the total
+        $this->calculateTotal();
+
+        // Increment the used count
+        $coupon->increment('used_count');
+
+        session()->flash('coupon_message', 'Coupon applied successfully!');
+        session()->flash('coupon_success', true);
+    }
+
     public function getUpdatedCart()
     {
         $this->cartItems = session('cart', []);
         $this->calculateTotal();
+        $this->total = $this->subtotal + $this->tax + $this->deliveryFee - $this->discount;
     }
 
     public function render()
@@ -43,7 +85,7 @@ class ShoppingCart extends Component
 
         $this->tax = $this->subtotal * 0.12; // Assuming 12% tax
         $this->deliveryFee = $this->shippingOption === 'rush' ? 100 : 0;
-        $this->total = $this->subtotal + $this->tax + $this->deliveryFee;
+        $this->total = $this->subtotal + $this->tax + $this->deliveryFee - $this->discount;
     }
 
     public function fetchRelatedProducts()

@@ -5,7 +5,8 @@
     tax: @entangle('tax'),
     deliveryFee: @entangle('deliveryFee'),
     paymentMethod: @entangle('paymentMethod'),
-    shippingOption: @entangle('shippingOption')
+    shippingOption: @entangle('shippingOption'),
+    discount: @entangle('discount')
 }" wire:poll.5s="getUpdatedCart">
     <section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
         <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -151,6 +152,10 @@
                                 <dd class="text-base font-bold text-gray-900 dark:text-white" x-text="'₱' + deliveryFee.toFixed(2)"></dd>
                             </dl>
                             <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
+                                <dt class="text-base font-bold text-gray-900 dark:text-white">Discount</dt>
+                                <dd class="text-base font-bold text-gray-900 dark:text-white" x-text="'₱' + discount.toFixed(2)"></dd>
+                            </dl>
+                            <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
                                 <dt class="text-base font-bold text-gray-900 dark:text-white">Total</dt>
                                 <dd class="text-base font-bold text-gray-900 dark:text-white" x-text="'₱' + total.toFixed(2)"></dd>
                             </dl>
@@ -176,14 +181,31 @@
                     </div>
 
                     <!-- Keep the Apply Code section as is -->
-                    <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-                        <form class="space-y-4">
+                    <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6"
+                         x-data="{ couponCode: '' }">
+                        <form class="space-y-4" @submit.prevent="$wire.applyCoupon(couponCode)">
                             <div>
-                                <label for="voucher" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"> Do you have a voucher or gift card? </label>
-                                <input type="text" id="voucher" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" placeholder="" required />
+                                <label for="voucher" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                                    Do you have a voucher or gift card?
+                                </label>
+                                <input type="text" id="voucher" 
+                                       x-model="couponCode"
+                                       class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" 
+                                       placeholder="Enter coupon code" required />
                             </div>
-                            <button type="submit" class="flex w-full items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Apply Code</button>
+                            <button type="submit" 
+                                    class="flex w-full items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                Apply Code
+                            </button>
                         </form>
+                        @error('coupon') 
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                        @enderror
+                        @if (session()->has('coupon_message'))
+                            <p class="mt-2 text-sm {{ session('coupon_success') ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500' }}">
+                                {{ session('coupon_message') }}
+                            </p>
+                        @endif
                     </div>
                 </div>
             </div>

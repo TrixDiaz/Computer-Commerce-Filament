@@ -78,7 +78,11 @@
 
                     <div class="pt-6">
                         <div class="mb-4 flex items-center justify-between gap-4">
-                            <span class="me-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"> Up to 10% off </span>
+                            @if($product->is_on_sale)
+                                <span class="me-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                    Up to {{ number_format((1 - $product->price / $product->original_price) * 100, 0) }}% off
+                                </span>
+                            @endif
                         </div>
 
                         <a href="#" class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{{ $product->name }}</a>
@@ -127,7 +131,12 @@
                         </ul>
 
                         <div class="mt-4 flex items-center justify-between gap-4">
-                            <p class="text-2xl font-bold leading-tight text-gray-900 dark:text-white">₱{{ number_format($product->price, 2) }}</p>
+                            <div>
+                                <p class="text-2xl font-bold leading-tight text-gray-900 dark:text-white">₱{{ number_format($product->price, 2) }}</p>
+                                @if($product->is_on_sale)
+                                    <p class="text-sm text-gray-500 line-through dark:text-gray-400">₱{{ number_format($product->original_price, 2) }}</p>
+                                @endif
+                            </div>
 
                             <button 
                                 wire:click="addToCart({{ $product->id }})" 

@@ -40,17 +40,13 @@
                     <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
                     <span wire:loading wire:target="addToCart">Adding...</span>
                 </button>
-                <button wire:click="payWithGCash({{ $product->id }})" 
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                        @guest disabled @endguest
-                        @guest class="opacity-50 cursor-not-allowed" @endguest>
+                <button onclick="window.location.href='{{ route('login') }}'" 
+                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                     Pay with GCash
                 </button>
             </div>
 
-            @guest
-                <p class="mt-4 text-red-500">Please <a href="{{ route('login') }}" class="underline">login</a> to add items to your cart or make a purchase.</p>
-            @endguest
+            <p class="mt-4 text-red-500">Please <a href="{{ route('login') }}" class="underline">login</a> to add items to your cart or make a purchase.</p>
         </div>
     </div>
 </div>

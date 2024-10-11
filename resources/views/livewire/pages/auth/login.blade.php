@@ -20,7 +20,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('dashboard', absolute: false));
     }
 }; ?>
 
@@ -51,7 +51,7 @@ new #[Layout('layouts.guest')] class extends Component
                     </div>
                 </div>
                 @if (Route::has('password.request'))
-                <a class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('password.request') }}" wire:navigate>
+                <a class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('password.request') }}">
                     {{ __('Forgot password?') }}
                 </a>
                 @endif
@@ -61,7 +61,7 @@ new #[Layout('layouts.guest')] class extends Component
             </x-primary-button>
             @if (Route::has('register'))
             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                {{ __("Don't have an account yet?") }} <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500" wire:navigate>{{ __('Sign up') }}</a>
+                {{ __("Don't have an account yet?") }} <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">{{ __('Sign up') }}</a>
             </p>
             @endif
         </form>

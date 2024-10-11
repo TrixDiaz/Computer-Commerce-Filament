@@ -33,20 +33,36 @@
 
             <!-- Add to Cart and Pay with GCash buttons -->
             <div class="flex space-x-4">
-                <button wire:click="addToCart({{ $product->id }})" 
-                        wire:loading.attr="disabled"
-                        wire:loading.class="opacity-50 cursor-not-allowed"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
-                    <span wire:loading wire:target="addToCart">Adding...</span>
-                </button>
-                <button onclick="window.location.href='{{ route('login') }}'" 
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Pay with GCash
-                </button>
+                @auth
+                    <button wire:click="addToCart({{ $product->id }})" 
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-50 cursor-not-allowed"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
+                        <span wire:loading wire:target="addToCart">Adding...</span>
+                    </button>
+                    <button wire:click="payWithGCash({{ $product->id }})" 
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-50 cursor-not-allowed"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        <span wire:loading.remove wire:target="payWithGCash">Pay with GCash</span>
+                        <span wire:loading wire:target="payWithGCash">Processing...</span>
+                    </button>
+                @else
+                    <a href="{{ route('login') }}" 
+                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Login to Add to Cart
+                    </a>
+                    <a href="{{ route('login') }}" 
+                       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        Login to Pay with GCash
+                    </a>
+                @endauth
             </div>
 
-            <p class="mt-4 text-red-500">Please <a href="{{ route('login') }}" class="underline">login</a> to add items to your cart or make a purchase.</p>
+            @guest
+                <p class="mt-4 text-red-500">Please <a href="{{ route('login') }}" class="underline">login</a> to add items to your cart or make a purchase.</p>
+            @endguest
         </div>
     </div>
 </div>

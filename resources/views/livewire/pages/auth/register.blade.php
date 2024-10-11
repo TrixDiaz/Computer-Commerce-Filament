@@ -34,7 +34,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $this->redirect(route('dashboard', absolute: false));
     }
 }; ?>
 
@@ -77,7 +77,7 @@ new #[Layout('layouts.guest')] class extends Component
                 {{ __('Create an account') }}
             </x-primary-button>
             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account? <a href="{{ route('login') }}" wire:navigate class="font-medium text-blue-600 hover:underline dark:text-blue-500">Login here</a>
+                Already have an account? <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Login here</a>
             </p>
         </form>
     </div>

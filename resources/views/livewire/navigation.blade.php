@@ -1,4 +1,4 @@
-<div x-data="{ cartCount: @entangle('cartCount') }" wire:poll.5s="updateCartCount">
+<div x-data="{ cartCount: @entangle('cartCount')}" wire:poll.5000ms>
     <nav class="bg-white dark:bg-gray-800 antialiased">
         <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0 py-4">
             <div class="flex items-center justify-between">
@@ -160,6 +160,10 @@
                 icon: data[0].type,
                 confirmButtonText: 'OK'
             });
+        });
+
+        Livewire.on('cartCountUpdated', (newCount) => {
+            Alpine.store('cartCount', newCount);
         });
     });
 </script>

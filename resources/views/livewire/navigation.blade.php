@@ -18,12 +18,12 @@
                             </a>
                         </li>
                         <li class="shrink-0">
-                            <a href="#" title="" class="flex text-sm font-medium text-gray-900 hover:text-blue-700 dark:text-white dark:hover:text-blue-500">
+                            <a href="{{ route('catalog') }}" title="" class="flex text-sm font-medium text-gray-900 hover:text-blue-700 dark:text-white dark:hover:text-blue-500">
                                 Best Sellers
                             </a>
                         </li>
                         <li class="shrink-0">
-                            <a href="#" title="" class="text-sm font-medium text-gray-900 hover:text-blue-700 dark:text-white dark:hover:text-blue-500">
+                            <a href="{{ route('catalog') }}" title="" class="text-sm font-medium text-gray-900 hover:text-blue-700 dark:text-white dark:hover:text-blue-500">
                                 Featured Products
                             </a>
                         </li>

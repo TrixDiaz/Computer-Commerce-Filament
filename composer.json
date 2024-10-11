@@ -9,6 +9,7 @@
         "bezhansalleh/filament-shield": "^3.2",
         "botman/driver-web": "^1.5",
         "filament/filament": "^3.2",
+        "filament/notifications": "^3.2",
         "guzzlehttp/guzzle": "^7.9",
         "ixudra/curl": "^6.22",
         "laravel/framework": "^11.9",

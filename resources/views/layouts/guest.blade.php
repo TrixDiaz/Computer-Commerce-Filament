@@ -15,8 +15,16 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Botman -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/assets/css/chat.min.css">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        input:focus {
+            @apply outline-none ring-0;
+        }
+    </style>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
@@ -47,6 +55,41 @@
                     showConfirmButton: false
                 });
             });
+        });
+    </script>
+
+    <script>
+        var botmanWidget = {
+            aboutText: 'Welcome! I\'m your virtual assistant, ready to help.',
+            introMessage: "Hello! How can I assist you today?",
+            title: 'Virtual Assistant',
+            mainColor: '#4a90e2',
+            bubbleBackground: '#4a90e2',
+            aboutLink: 'https://www.google.com',
+            open: true,
+            disableUserInput: false,
+            inputDisabled: false,
+            placeholderText: 'Send a message...',
+            autofocus: false,
+            chatServer: '/botman',
+            frameEndpoint: '/botman/chat',
+            displayMessageTime: true
+        };
+    </script>
+
+    <!-- Botman -->
+    <script src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js'></script>
+    <script id="botmanWidget" src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/chat.js'></script>
+
+    <!-- Add this script to remove focus -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const chatInput = document.querySelector('#userText');
+                if (chatInput) {
+                    chatInput.blur();
+                }
+            }, 100);
         });
     </script>
 </body>

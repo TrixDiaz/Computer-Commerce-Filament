@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BotManController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\ShoppingCart;
 
@@ -29,5 +30,7 @@ Route::get('product-profile/{slug}', function ($slug) {
 
 Route::get('/payment/success', ShoppingCart::class . '@handlePaymentSuccess')->name('payment.success');
 Route::get('/payment/failed', ShoppingCart::class . '@handlePaymentFailed')->name('payment.failed');
+
+Route::match(['get', 'post'], '/botman', BotManController::class . '@handle')->name('botman.index');
 
 require __DIR__ . '/auth.php';

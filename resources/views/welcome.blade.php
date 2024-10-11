@@ -14,25 +14,33 @@
     <!-- Flowbite -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
 
+    <!-- Botman -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/assets/css/chat.min.css">
+
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+
+    <style>
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+
+        input:focus {
+            @apply outline-none ring-0;
+        }
+    </style>
 </head>
-<style>
-    @keyframes marquee {
-        0% {
-            transform: translateX(100%);
-        }
-
-        100% {
-            transform: translateX(-100%);
-        }
-    }
-
-    .animate-marquee {
-        animation: marquee 20s linear infinite;
-    }
-</style>
 
 <body class="antialiased font-sans">
     <!-- Banner -->
@@ -67,6 +75,42 @@
 
     <!-- Flowbite -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+
+    <script>
+        var botmanWidget = {
+            aboutText: 'Welcome! I\'m your virtual assistant, ready to help.',
+            introMessage: "Hello! How can I assist you today?",
+            title: 'Virtual Assistant',
+            mainColor: '#4a90e2',
+            bubbleBackground: '#4a90e2',
+            aboutLink: 'https://www.google.com',
+            open: true,
+            disableUserInput: false,
+            inputDisabled: false,
+            placeholderText: 'Send a message...',
+            autofocus: false,
+            chatServer: '/botman',
+            frameEndpoint: '/botman/chat',
+            displayMessageTime: true
+        };
+    </script>
+
+    <!-- Botman -->
+    <script src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js'></script>
+    <script id="botmanWidget" src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/chat.js'></script>
+
+    <!-- Add this script to remove focus -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const chatInput = document.querySelector('#userText');
+                if (chatInput) {
+                    chatInput.blur();
+                }
+            }, 100);
+        });
+    </script>
+
     @livewireScripts
 </body>
 

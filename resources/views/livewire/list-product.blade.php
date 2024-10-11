@@ -26,14 +26,21 @@
                     </nav>
                     <h2 class="mt-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Products</h2>
                 </div>
-                <!-- Filter Button -->
-                <!-- Add search input -->
+                <!-- Search, Filter, and Sort -->
                 <div class="flex items-center space-x-4">
                     <input
                         wire:model.live.debounce.500ms="search"
                         type="text"
                         placeholder="Search products..."
                         class="w-64 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500">
+                    <button
+                        wire:click="toggleFilterModal"
+                        class="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 me-2 mr-0.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                        </svg>
+                        Filter Products
+                    </button>
                     <select
                         wire:model.live="sort"
                         class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500">
@@ -120,7 +127,7 @@
                         </ul>
 
                         <div class="mt-4 flex items-center justify-between gap-4">
-                            <p class="text-2xl font-extrabold leading-tight text-gray-900 dark:text-white">${{ number_format($product->price, 2) }}</p>
+                            <p class="text-2xl font-extrabold leading-tight text-gray-900 dark:text-white">₱{{ number_format($product->price, 2) }}</p>
 
                             <button type="button" class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4  focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                 <svg class="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -140,4 +147,85 @@
         </div>
 
     </section>
+
+    <!-- Filter Modal -->
+    @if($showFilterModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Filter Products
+                    </h3>
+                    <div class="mt-4">
+                        <!-- Categories -->
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-700">Categories</h4>
+                            @foreach($categories as $category)
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="selectedCategories" value="{{ $category->id }}" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">{{ $category->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+
+                        <!-- Brands -->
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-700">Brands</h4>
+                            @foreach($brands as $brand)
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="selectedBrands" value="{{ $brand->id }}" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">{{ $brand->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-700">Price Range</h4>
+                            <div class="flex items-center mt-2">
+                                <input type="number" wire:model.live="minPrice" placeholder="Min" class="w-1/2 mr-2 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                                <input type="number" wire:model.live="maxPrice" placeholder="Max" class="w-1/2 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Other Filters -->
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-700">Other Filters</h4>
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="onSale" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">On Sale</span>
+                            </label>
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="isNew" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">New Arrivals</span>
+                            </label>
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="isBestSeller" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">Best Sellers</span>
+                            </label>
+                            <label class="inline-flex items-center mt-2">
+                                <input type="checkbox" wire:model.live="isTopRated" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">Top Rated</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button wire:click="applyFilters" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Apply Filters
+                    </button>
+                    <button wire:click="resetFilters" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Reset Filters
+                    </button>
+                    <button wire:click="toggleFilterModal" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

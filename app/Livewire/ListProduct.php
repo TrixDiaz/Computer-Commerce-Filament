@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Support\Facades\DB;
 
 class ListProduct extends Component
@@ -16,7 +18,33 @@ class ListProduct extends Component
     public $search = '';
 
     #[Url]
-    public $sort = ''; // Default sorting
+    public $sort = '';
+
+    public $showFilterModal = false;
+
+    #[Url]
+    public $selectedCategories = [];
+
+    #[Url]
+    public $selectedBrands = [];
+
+    #[Url]
+    public $minPrice = null;
+
+    #[Url]
+    public $maxPrice = null;
+
+    #[Url]
+    public $onSale = false;
+
+    #[Url]
+    public $isNew = false;
+
+    #[Url]
+    public $isBestSeller = false;
+
+    #[Url]
+    public $isTopRated = false;
 
     public function updatedSearch()
     {
@@ -28,10 +56,72 @@ class ListProduct extends Component
         $this->resetPage();
     }
 
+    public function toggleFilterModal()
+    {
+        $this->showFilterModal = !$this->showFilterModal;
+    }
+
+    public function applyFilters()
+    {
+        $this->resetPage();
+        $this->showFilterModal = false;
+    }
+
+    public function resetFilters()
+    {
+        $this->selectedCategories = [];
+        $this->selectedBrands = [];
+        $this->minPrice = null;
+        $this->maxPrice = null;
+        $this->onSale = false;
+        $this->isNew = false;
+        $this->isBestSeller = false;
+        $this->isTopRated = false;
+        $this->resetPage();
+    }
+
     public function render()
     {
-        $query = Product::where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%');
+        $query = Product::query();
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if (!empty($this->selectedCategories)) {
+            $query->whereIn('category_id', $this->selectedCategories);
+        }
+
+        if (!empty($this->selectedBrands)) {
+            $query->whereIn('brand_id', $this->selectedBrands);
+        }
+
+        if ($this->minPrice !== null) {
+            $query->where('price', '>=', $this->minPrice);
+        }
+
+        if ($this->maxPrice !== null) {
+            $query->where('price', '<=', $this->maxPrice);
+        }
+
+        if ($this->onSale) {
+            $query->where('is_on_sale', true);
+        }
+
+        if ($this->isNew) {
+            $query->where('is_new', true);
+        }
+
+        if ($this->isBestSeller) {
+            $query->where('is_best_seller', true);
+        }
+
+        if ($this->isTopRated) {
+            $query->where('is_top_rated', true);
+        }
 
         switch ($this->sort) {
             case 'name_asc':
@@ -57,7 +147,9 @@ class ListProduct extends Component
         }
 
         return view('livewire.list-product', [
-            'products' => $query->paginate(10)
+            'products' => $query->paginate(12),
+            'categories' => Category::all(),
+            'brands' => Brand::all(),
         ]);
     }
 }

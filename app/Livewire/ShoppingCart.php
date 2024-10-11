@@ -21,11 +21,33 @@ class ShoppingCart extends Component
     public $shippingOption = 'normal';
     public $couponCode;
     public $discount = 0;
+    public $addresses = [];
+    public $selectedAddressId = null;
+    public $newAddress = [
+        'user_id' => '',
+        'address_line_1' => '',
+        'address_line_2' => '',
+        'city' => '',
+        'state' => '',
+        'postal_code' => '',
+        'country' => '',
+    ];
 
     public function mount()
     {
         $this->getUpdatedCart();
         $this->fetchRelatedProducts();
+        $this->loadUserAddresses();
+    }
+
+    public function loadUserAddresses()
+    {
+        if (auth()->check()) {
+            $this->addresses = auth()->user()->addresses()->get();
+            if ($this->addresses->isNotEmpty()) {
+                $this->selectedAddressId = $this->addresses->first()->id;
+            }
+        }
     }
 
     public function applyCoupon($couponCode)
@@ -131,6 +153,15 @@ class ShoppingCart extends Component
 
     public function proceedToCheckout()
     {
+        if (!$this->selectedAddressId) {
+            $this->dispatch('swal:error', [
+                'title' => 'Error!',
+                'text' => 'Please select or add a shipping address.',
+                'icon' => 'error',
+            ]);
+            return;
+        }
+
         if ($this->paymentMethod === 'cod') {
             // Handle Cash on Delivery checkout
             $this->handleCashOnDeliveryCheckout();
@@ -246,6 +277,43 @@ class ShoppingCart extends Component
             'title' => 'Payment Failed',
             'text' => 'Your payment was not successful. Please try again.',
             'icon' => 'error',
+        ]);
+    }
+
+    public function selectAddress($addressId)
+    {
+        $this->selectedAddressId = $addressId;
+    }
+
+    public function addNewAddress()
+    {
+        $this->validate([
+            'newAddress.address_line_1' => 'required',
+            'newAddress.city' => 'required',
+            'newAddress.state' => 'required',
+            'newAddress.postal_code' => 'required',
+            'newAddress.country' => 'required',
+        ]);
+
+        $this->newAddress['user_id'] = auth()->id();
+
+        $address = auth()->user()->addresses()->create($this->newAddress);
+        $this->addresses->push($address);
+        $this->selectedAddressId = $address->id;
+        $this->newAddress = [
+            'user_id' => '',
+            'address_line_1' => '',
+            'address_line_2' => '',
+            'city' => '',
+            'state' => '',
+            'postal_code' => '',
+            'country' => '',
+        ];
+
+        $this->dispatch('swal:success', [
+            'title' => 'Success!',
+            'text' => 'New address added successfully!',
+            'icon' => 'success',
         ]);
     }
 }

@@ -25,6 +25,10 @@ Route::view('payment', 'payment')
     ->middleware(['auth', 'verified'])
     ->name('payment');
 
+Route::view('orders', 'orders')
+    ->middleware(['auth', 'verified'])
+    ->name('orders');
+
 Route::get('product-profile/{slug}', function ($slug) {
     return view('product-profile', ['slug' => $slug]);
 })->name('product-profile');

@@ -64,6 +64,35 @@ class ProductProfile extends Component
         $product = Product::findOrFail($productId);
         $total = $product->price;
 
+        // Set session data for single product purchase
+        session()->put('cart', [
+            $productId => [
+                "id" => $product->id,
+                "name" => $product->name,
+                "slug" => $product->slug,
+                "description" => $product->description,
+                "quantity" => 1,
+                "price" => $product->price,
+                "image" => $product->image_url,
+                "sku" => $product->sku,
+                "category_id" => $product->category_id,
+                "brand_id" => $product->brand_id,
+                "stock_quantity" => $product->stock_quantity,
+                "is_featured" => $product->is_featured,
+                "is_active" => $product->is_active,
+                "is_sale" => $product->is_sale,
+                "is_new" => $product->is_new,
+                "is_best_seller" => $product->is_best_seller,
+                "is_top_rated" => $product->is_top_rated,
+                "is_on_sale" => $product->is_on_sale,
+            ]
+        ]);
+
+        // Set other necessary session data
+        session()->put('selected_address_id', auth()->user()->addresses->first()->id ?? null);
+        session()->put('payment_method', 'gcash');
+        session()->put('shipping_option', 'standard');
+
         $data = [
             'data' => [
                 'attributes' => [

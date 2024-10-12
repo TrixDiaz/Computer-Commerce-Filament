@@ -1,5 +1,5 @@
 <div>
-    <div class="dark:bg-slate-800 dark:text-white">
+    <div class="bg-slate-100 dark:bg-slate-800 dark:text-white">
         <div class="max-w-7xl mx-auto">
             <div class="hidden md:block overflow-hidden py-2">
                 <div class="relative whitespace-nowrap">

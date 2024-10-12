@@ -28,7 +28,7 @@ class OrderInvoice extends Mailable
     /**
      * Get the message envelope.
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
             subject: 'Order Invoice',
@@ -38,12 +38,10 @@ class OrderInvoice extends Mailable
     /**
      * Get the message content definition.
      */
-    public function build()
+    public function build(): Mailable
     {
         return $this->view('emails.order-invoice');
     }
-
-    
 
     /**
      * Get the attachments for the message.

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('SET NULL');
             $table->string('order_number')->unique();
             $table->decimal('total_amount', 10, 2);
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
+            $table->enum('status', ['pending', 'processing', 'completed', 'cancelled'])->default('pending');
             $table->foreign('billing_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
             $table->foreign('shipping_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
             $table->text('notes')->nullable();

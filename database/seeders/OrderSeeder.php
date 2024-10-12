@@ -14,8 +14,7 @@ class OrderSeeder extends Seeder
     {
         $faker = Faker::create();
         $users = User::all();
-        $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-
+        
         for ($i = 0; $i < 100; $i++) {
             $user = $faker->randomElement($users);
             $billingAddress = $user->addresses()->where('type', 'billing')->first();
@@ -25,7 +24,7 @@ class OrderSeeder extends Seeder
                 'user_id' => $user->id,
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
                 'total_amount' => $faker->randomFloat(2, 10, 1000),
-                'status' => $faker->randomElement($statuses),
+                'status' => Order::STATUS_PENDING,
                 'billing_address_id' => $billingAddress->id,
                 'shipping_address_id' => $shippingAddress->id,
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),

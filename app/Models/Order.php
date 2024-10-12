@@ -19,6 +19,18 @@ class Order extends Model
         'notes',
     ];
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
+
+    public static $statuses = [
+        self::STATUS_PENDING,
+        self::STATUS_PROCESSING,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'user_id');

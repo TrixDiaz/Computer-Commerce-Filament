@@ -14,9 +14,6 @@
     <!-- Flowbite -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
 
-    <!-- Botman -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/assets/css/chat.min.css">
-
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
@@ -44,10 +41,10 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
-
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Drift Code (without automatic widget) -->
     <script>

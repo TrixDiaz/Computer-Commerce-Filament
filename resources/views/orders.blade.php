@@ -1,3 +1,5 @@
 <x-app-layout>
-    <livewire:orders />
+    <div class="bg-white">
+        <livewire:orders />
+    </div>
 </x-app-layout>

@@ -1,6 +1,7 @@
-<div class="bg-white p-6">
-    <div class="flex justify-between mb-8">
-        <div>
+<div class="antialiased max-w-screen-xl px-4 mx-auto 2xl:px-0 py-4">
+    <div class="bg-white p-6">
+        <div class="flex justify-between mb-8">
+            <div>
             <h2 class="text-2xl font-bold">INVOICE</h2>
             <p>Order #{{ $order->order_number }}</p>
             <p>Date: {{ $order->created_at->format('M d, Y') }}</p>
@@ -34,15 +35,15 @@
                 <tr>
                     <td>{{ $item->product->name }}</td>
                     <td class="text-right">{{ $item->quantity }}</td>
-                    <td class="text-right">${{ number_format($item->price, 2) }}</td>
-                    <td class="text-right">${{ number_format($item->quantity * $item->price, 2) }}</td>
+                    <td class="text-right">₱{{ number_format($item->price, 2) }}</td>
+                    <td class="text-right">₱{{ number_format($item->quantity * $item->price, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="3" class="text-right font-semibold">Total:</td>
-                <td class="text-right font-semibold">${{ number_format($order->total_amount, 2) }}</td>
+                <td class="text-right font-semibold">₱{{ number_format($order->total_amount, 2) }}</td>
             </tr>
         </tfoot>
     </table>

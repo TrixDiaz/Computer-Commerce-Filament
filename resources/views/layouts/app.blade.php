@@ -118,8 +118,8 @@
         });
     </script>
 
-   <!-- Custom Chat Widget -->
-   <div x-data="chatWidget()" x-cloak>
+  <!-- Custom Chat Widget -->
+  <div x-data="chatWidget()" x-cloak>
         <!-- Toggle Button -->
         <button @click="toggleChat()" 
                 x-show="!isDriftVisible"

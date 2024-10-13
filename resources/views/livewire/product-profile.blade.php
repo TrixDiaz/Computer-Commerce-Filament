@@ -2,10 +2,12 @@
     <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ $product->name }}</h1>
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
         <!-- Image gallery -->
-        <div class="space-y-4">
+        <div x-data="{ 
+            mainImage: '{{ $product->images_url[0] ?? '' }}'
+        }" class="space-y-4">
             @if(is_array($product->images_url) && count($product->images_url) > 0)
                 <!-- Main image -->
-                <div x-data="{ mainImage: '{{ $product->images_url[0] }}' }" class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg shadow-lg">
+                <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg shadow-lg">
                     <img :src="mainImage" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition-opacity duration-300">
                 </div>
                 

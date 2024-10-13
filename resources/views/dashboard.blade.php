@@ -1,4 +1,7 @@
 <x-app-layout>
+    <!-- Address Check -->
+    <livewire:address-check />
+
     <!-- Livewire Hero Section  -->
     <livewire:hero-section />
 

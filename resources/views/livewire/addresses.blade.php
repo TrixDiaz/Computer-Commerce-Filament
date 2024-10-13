@@ -25,28 +25,34 @@
     <form wire:submit.prevent="addAddress" class="mt-4">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-                <label for="address_line_1" class="block text-sm font-medium text-gray-700">Address Line 1</label>
+                <label for="address_line_1" class="block text-sm font-medium text-gray-700" required>Address Line 1</label>
                 <input type="text" wire:model="address_line_1" id="address_line_1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('address_line_1') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label for="address_line_2" class="block text-sm font-medium text-gray-700">Address Line 2</label>
                 <input type="text" wire:model="address_line_2" id="address_line_2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('address_line_2') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label for="city" class="block text-sm font-medium text-gray-700">City</label>
                 <input type="text" wire:model="city" id="city" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label for="state" class="block text-sm font-medium text-gray-700">State</label>
                 <input type="text" wire:model="state" id="state" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('state') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label for="postal_code" class="block text-sm font-medium text-gray-700">Postal Code</label>
                 <input type="text" wire:model="postal_code" id="postal_code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('postal_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
                 <input type="text" wire:model="country" id="country" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @error('country') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="mt-4">

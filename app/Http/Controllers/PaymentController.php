@@ -10,11 +10,26 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 
 class PaymentController extends Controller
 {
     public function handlePaymentSuccess(Request $request)
     {
+        // Create order and send invoice email
+        // $order = $this->createOrderAndSendInvoice();
+        $order = null;
+        if (!$order) {
+            // Handle the case where order creation failed
+            session()->flash('swal:error', [
+                'title' => 'Error!',
+                'text' => 'There was a problem creating your order. Please contact support.',
+                'icon' => 'error',
+            ]);
+            return redirect()->route('cart')->with('error', 'Order creation failed.');
+        }
+
         // Handle successful payment
         session()->flash('swal:success', [
             'title' => 'Success!',
@@ -22,11 +37,21 @@ class PaymentController extends Controller
             'icon' => 'success',
         ]);
 
-        // Create order and send invoice email
-        $this->createOrderAndSendInvoice();
-
         // Clear the cart or session data
         session()->forget(['cart', 'selected_address_id', 'discount', 'payment_method', 'shipping_option']);
+
+        // Create Filament notification
+        auth()->user()->notify(
+            Notification::make()
+                ->success()
+                ->title('Order Placed Successfully')
+                ->body("Your order #{$order->order_number} has been placed successfully.")
+                ->actions([
+                    Action::make('view')
+                        ->button()
+                        ->url(route('filament.resources.orders.view', $order))
+                ])
+        );
 
         return redirect()->route('home')->with('success', 'Payment successful!');
     }
@@ -49,7 +74,7 @@ class PaymentController extends Controller
                 'text' => 'No shipping address found for order',
                 'icon' => 'error',
             ]);
-            return;
+            return null;
         }
 
         // Create order
@@ -96,6 +121,8 @@ class PaymentController extends Controller
         ];
 
         Mail::to($user->email)->send(new OrderInvoice($user, $orderDetails));
+
+        return $order; // Return the created order
     }
 
     private function calculateSubtotal($cartItems)
@@ -125,6 +152,4 @@ class PaymentController extends Controller
 
         return $subtotal + $tax + $deliveryFee - $discount;
     }
-
-   
 }

@@ -13,6 +13,7 @@ use App\Mail\OrderInvoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
+use App\Models\Product;
 
 class ShoppingCart extends Component
 {
@@ -95,6 +96,14 @@ class ShoppingCart extends Component
     public function getUpdatedCart()
     {
         $this->cartItems = session('cart', []);
+        foreach ($this->cartItems as $productId => &$item) {
+            $product = \App\Models\Product::find($productId);
+            if ($product) {
+                $item['stock'] = $product->stock_quantity;
+                // Ensure the quantity doesn't exceed the stock
+                $item['quantity'] = min($item['quantity'], $item['stock']);
+            }
+        }
         $this->calculateTotal();
         $this->total = $this->subtotal + $this->tax + $this->deliveryFee - $this->discount;
     }
@@ -137,9 +146,14 @@ class ShoppingCart extends Component
     public function updateQuantity($productId, $quantity)
     {
         if (isset($this->cartItems[$productId])) {
-            $this->cartItems[$productId]['quantity'] = max(1, $quantity);
-            session(['cart' => $this->cartItems]);
-            $this->calculateTotal();
+            $product = \App\Models\Product::find($productId);
+            if ($product) {
+                $maxQuantity = min($product->stock_quantity, max(1, $quantity));
+                $this->cartItems[$productId]['quantity'] = $maxQuantity;
+                $this->cartItems[$productId]['stock'] = $product->stock_quantity;
+                session(['cart' => $this->cartItems]);
+                $this->calculateTotal();
+            }
         }
     }
 
@@ -354,5 +368,39 @@ class ShoppingCart extends Component
             'text' => 'New address added successfully!',
             'icon' => 'success',
         ]);
+    }
+
+    public function addToCart($productId)
+    {
+        $product = \App\Models\Product::find($productId);
+        if ($product && $product->stock_quantity > 0) {
+            if (isset($this->cartItems[$productId])) {
+                if ($this->cartItems[$productId]['quantity'] < $product->stock_quantity) {
+                    $this->cartItems[$productId]['quantity']++;
+                }
+            } else {
+                $this->cartItems[$productId] = [
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => 1,
+                    'stock' => $product->stock_quantity,
+                    // Add other necessary product details
+                ];
+            }
+            session(['cart' => $this->cartItems]);
+            $this->calculateTotal();
+            $this->dispatch('swal:success', [
+                'title' => 'Success!',
+                'text' => 'Item added to cart successfully!',
+                'icon' => 'success',
+                'timer' => 3000,
+            ]);
+        } else {
+            $this->dispatch('swal:error', [
+                'title' => 'Error!',
+                'text' => 'This product is out of stock.',
+                'icon' => 'error',
+            ]);
+        }
     }
 }

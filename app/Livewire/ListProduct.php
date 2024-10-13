@@ -48,6 +48,21 @@ class ListProduct extends Component
     #[Url]
     public $isTopRated = false;
 
+    public $stock_quantity = 0;
+
+    public $selectedCategory = null;
+    public $selectedBrand = null;
+    public $sortBy = 'newest';
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'selectedCategory' => ['except' => ''],
+        'selectedBrand' => ['except' => ''],
+        'minPrice' => ['except' => ''],
+        'maxPrice' => ['except' => ''],
+        'sortBy' => ['except' => 'newest'],
+    ];
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -71,34 +86,24 @@ class ListProduct extends Component
 
     public function resetFilters()
     {
-        $this->selectedCategories = [];
-        $this->selectedBrands = [];
-        $this->minPrice = null;
-        $this->maxPrice = null;
-        $this->onSale = false;
-        $this->isNew = false;
-        $this->isBestSeller = false;
-        $this->isTopRated = false;
+        $this->reset(['search', 'selectedCategory', 'selectedBrand', 'minPrice', 'maxPrice', 'sortBy']);
         $this->resetPage();
     }
 
     public function render()
     {
-        $query = Product::query();
+        $query = Product::query()->where('stock_quantity', '>', 0);
 
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
-            });
+            $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        if (!empty($this->selectedCategories)) {
-            $query->whereIn('category_id', $this->selectedCategories);
+        if ($this->selectedCategory) {
+            $query->where('category_id', $this->selectedCategory);
         }
 
-        if (!empty($this->selectedBrands)) {
-            $query->whereIn('brand_id', $this->selectedBrands);
+        if ($this->selectedBrand) {
+            $query->where('brand_id', $this->selectedBrand);
         }
 
         if ($this->minPrice !== null) {
@@ -109,43 +114,13 @@ class ListProduct extends Component
             $query->where('price', '<=', $this->maxPrice);
         }
 
-        if ($this->onSale) {
-            $query->where('is_on_sale', true);
-        }
-
-        if ($this->isNew) {
-            $query->where('is_new', true);
-        }
-
-        if ($this->isBestSeller) {
-            $query->where('is_best_seller', true);
-        }
-
-        if ($this->isTopRated) {
-            $query->where('is_top_rated', true);
-        }
-
-        switch ($this->sort) {
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'created_asc':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'created_desc':
-                $query->orderBy('created_at', 'desc');
-                break;
-            default:
-                $query->orderBy(DB::raw('RAND()'));
+        // Apply sorting
+        if ($this->sortBy === 'price_asc') {
+            $query->orderBy('price', 'asc');
+        } elseif ($this->sortBy === 'price_desc') {
+            $query->orderBy('price', 'desc');
+        } elseif ($this->sortBy === 'newest') {
+            $query->orderBy('created_at', 'desc');
         }
 
         return view('livewire.list-product', [

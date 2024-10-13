@@ -25,6 +25,7 @@ class OrderSeeder extends Seeder
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
                 'total_amount' => $faker->randomFloat(2, 10, 1000),
                 'status' => Order::STATUS_PENDING,
+                'payment_method' => 'cod',
                 'billing_address_id' => $billingAddress->id,
                 'shipping_address_id' => $shippingAddress->id,
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),

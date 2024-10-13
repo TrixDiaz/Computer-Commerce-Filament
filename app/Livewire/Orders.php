@@ -12,6 +12,8 @@ class Orders extends Component
     public $showInvoice = false;
     public $showCancelConfirmation = false;
     public $orderIdToCancel;
+    public $showRefundConfirmation = false;
+    public $orderToRefund;
 
     public function mount()
     {
@@ -37,6 +39,30 @@ class Orders extends Component
         $this->orderIdToCancel = null;
 
         return redirect()->route('orders');
+    }
+
+    public function confirmRefundOrder($orderId)
+    {
+        $this->orderToRefund = $orderId;
+        $this->showRefundConfirmation = true;
+    }
+
+    public function refundOrder()
+    {
+        $order = Order::find($this->orderToRefund);
+        if ($order) {
+            // Perform the refund logic here
+            $order->status = 'refunded';
+            $order->save();
+
+            // You might want to add more logic here, such as
+            // updating inventory, notifying the customer, etc.
+
+            $this->showRefundConfirmation = false;
+            $this->orderToRefund = null;
+
+            session()->flash('message', 'Order refunded successfully.');
+        }
     }
 
     public function viewOrderDetails($orderId)

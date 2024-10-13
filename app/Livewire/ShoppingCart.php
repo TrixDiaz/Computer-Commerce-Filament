@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderInvoice;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Str;
 
 class ShoppingCart extends Component
 {
@@ -169,8 +172,6 @@ class ShoppingCart extends Component
             'cart' => $this->cartItems,
             'selected_address_id' => $this->selectedAddressId,
             'payment_method' => $this->paymentMethod,
-            'shipping_option' => $this->shippingOption,
-            'discount' => $this->discount,
         ]);
 
         if ($this->paymentMethod === 'cod') {
@@ -184,18 +185,44 @@ class ShoppingCart extends Component
 
     private function handleCashOnDeliveryCheckout()
     {
-        // Implement Cash on Delivery logic here
-        // For example, save the order to the database and redirect to a confirmation page
+        // Generate a unique order number
+        $orderNumber = 'ORD-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(5));
+
+        // Create a new order
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'order_number' => $orderNumber,
+            'total_amount' => $this->total,
+            'status' => 'pending',
+            'payment_method' => 'cod',
+            'shipping_address_id' => $this->selectedAddressId,
+        ]);
+
+        // Add order items
+        foreach ($this->cartItems as $productId => $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $productId,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ]);
+        }
+
+        // Clear the cart session
+        session()->forget('cart');
+
         $this->dispatch('swal:success', [
             'title' => 'Order Placed!',
             'text' => 'Your Cash on Delivery order has been placed successfully.',
             'icon' => 'success',
         ]);
-        // Clear the cart or perform any other necessary actions
+
+        // Clear the component's cart items and total
         $this->cartItems = [];
         $this->total = 0;
-        // Redirect to a confirmation page
-        return redirect()->route('home');
+
+        // Redirect to the confirmation page
+        return redirect()->route('order.confirmation', ['order' => $order->id]);
     }
 
     private function handleGCashCheckout()
@@ -222,6 +249,29 @@ class ShoppingCart extends Component
             ],
         ];
 
+        // Generate a unique order number
+        $orderNumber = 'ORD-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(5));
+
+        // Create a pending order
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'order_number' => $orderNumber,
+            'total_amount' => $this->total,
+            'status' => 'pending',
+            'payment_method' => 'gcash',
+            'shipping_address_id' => $this->selectedAddressId, 
+        ]);
+
+        // Add order items
+        foreach ($this->cartItems as $productId => $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $productId,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ]);
+        }
+
         $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
             ->withHeader('Content-Type: application/json')
             ->withHeader('accept: application/json')
@@ -233,6 +283,7 @@ class ShoppingCart extends Component
         if (isset($response->data->attributes->checkout_url)) {
             Session::put('session_id', $response->data->id);
             Session::put('checkout_url', $response->data->attributes->checkout_url);
+            Session::put('order_id', $order->id);
             return redirect()->to($response->data->attributes->checkout_url);
         } else {
             // Handle error

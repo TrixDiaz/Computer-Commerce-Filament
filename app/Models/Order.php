@@ -14,21 +14,24 @@ class Order extends Model
         'order_number',
         'total_amount',
         'status',
-        'billing_address_id',
+        'payment_status',
+        'payment_method',
         'shipping_address_id',
-        'notes',
+        'shipping_option',
+        'discount',
     ];
 
     const STATUS_PENDING = 'pending';
     const STATUS_PROCESSING = 'processing';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
-
+    const STATUS_REFUNDED = 'refunded';
     public static $statuses = [
         self::STATUS_PENDING,
         self::STATUS_PROCESSING,
         self::STATUS_COMPLETED,
         self::STATUS_CANCELLED,
+        self::STATUS_REFUNDED,
     ];
 
     public function customer()
@@ -47,6 +50,11 @@ class Order extends Model
     }
 
     public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function items()
     {
         return $this->hasMany(OrderItem::class);
     }

@@ -14,6 +14,9 @@
                     Date
                 </th>
                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Payment Method
+                </th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                 </th>
                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -33,24 +36,36 @@
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
                     {{ $order->created_at->format('M d, Y') }}
                 </td>
+                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300 capitalize text-sm">
+                    @if($order->payment_method === 'cod')
+                    Cash on Delivery
+                    @else
+                    GCash
+                    @endif
+                </td>
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $order->status === 'completed' ? 'green' : 'yellow' }}-100 text-{{ $order->status === 'completed' ? 'green' : 'yellow' }}-800">
-                        {{ ucfirst($order->status) }}
-                    </span>
+                    <div wire:poll.10s>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $order->status === 'completed' ? 'green' : 'yellow' }}-100 text-{{ $order->status === 'completed' ? 'green' : 'yellow' }}-800">
+                            {{ ucfirst($order->status) }}
+                        </span>
+                    </div>
                 </td>
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
                     ₱{{ number_format($order->total_amount, 2) }}
                 </td>
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
-                <button wire:click="viewOrderDetails({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-indigo-500 text-white">View</button>
-                @if($order->status !== 'completed')
-                <button wire:click="confirmCancelOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-red-500 text-white">Cancel</button>
-                @endif
-                
-                @if($order->status === 'completed')
-                <button wire:click="refundOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-yellow-500 text-white">Refund</button>   
-                <button wire:click="generateInvoice({{ $order->id }})" class="px-2 py-1 rounded-md bg-green-500 text-white">Invoice</button>
-                @endif
+                    <button wire:click="viewOrderDetails({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-indigo-500 text-white">View</button>
+                    @if($order->status !== 'completed')
+                        @if($order->payment_method === 'cod')
+                        <button wire:click="confirmCancelOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-red-500 text-white">Cancel</button>
+                        @elseif($order->payment_method === 'gcash')
+                        <button wire:click="confirmRefundOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-yellow-500 text-white">Refund</button>
+                        @endif
+                    @endif
+
+                    @if($order->status === 'completed')
+                    <button wire:click="generateInvoice({{ $order->id }})" class="px-2 py-1 rounded-md bg-green-500 text-white">Invoice</button>
+                    @endif
                 </td>
             </tr>
             @endforeach
@@ -136,14 +151,39 @@
                 <div class="items-center px-4 py-3">
                     <button
                         wire:click="cancelOrder"
-                        class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
-                    >
+                        class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
                         Yes, Cancel Order
                     </button>
                     <button
                         wire:click="$set('showCancelConfirmation', false)"
-                        class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    >
+                        class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        No, Keep Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($showRefundConfirmation)
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="refund-confirmation-modal">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Refund Order</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Are you sure you want to refund this order? This action cannot be undone.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button
+                        wire:click="refundOrder"
+                        class="px-4 py-2 bg-yellow-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                        Yes, Refund Order
+                    </button>
+                    <button
+                        wire:click="$set('showRefundConfirmation', false)"
+                        class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
                         No, Keep Order
                     </button>
                 </div>

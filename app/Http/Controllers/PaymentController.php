@@ -99,7 +99,7 @@ class PaymentController extends Controller
                 'price' => $item['price'],
             ]);
 
-            // Update product stock
+            // Update product stock in the database
             $product = Product::find($productId);
             if ($product) {
                 $product->stock_quantity -= $item['quantity'];

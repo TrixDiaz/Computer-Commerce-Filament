@@ -30,8 +30,10 @@ class ReviewsRelationManager extends RelationManager
             ->recordTitleAttribute('Review')
             ->columns([
                 Tables\Columns\TextColumn::make('product.name'),
-                Tables\Columns\TextColumn::make('user_id'),
-                Tables\Columns\TextColumn::make('rating'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Customer'),
+                Tables\Columns\TextColumn::make('rating')
+                    ->suffix(' ⭐'),
                 Tables\Columns\TextColumn::make('comment'),
                 Tables\Columns\ToggleColumn::make('is_approved')
                     ->label('Approved')

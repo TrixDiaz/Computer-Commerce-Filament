@@ -43,8 +43,6 @@ Route::get('/payment/failed', [PaymentController::class, 'handlePaymentFailed'])
 
 Route::match(['get', 'post'], '/botman', BotManController::class . '@handle')->name('botman.index');
 
-Route::get('/send-test-email', [App\Http\Controllers\PaymentController::class, 'sendTestEmail'])->name('send.test.email');
-
 Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
 
 require __DIR__ . '/auth.php';

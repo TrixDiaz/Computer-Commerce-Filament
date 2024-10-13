@@ -95,6 +95,9 @@
                     <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Subtotal
                     </th>
+                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Review
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -107,10 +110,15 @@
                         {{ $item->quantity }}
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
-                        ${{ number_format($item->price, 2) }}
+                        ₱{{ number_format($item->price, 2) }}
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
-                        ${{ number_format($item->quantity * $item->price, 2) }}
+                        ₱{{ number_format($item->quantity * $item->price, 2) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
+                        <button wire:click="openReviewModal({{ $order->id }}, {{ $item->product_id }})" class="px-2 py-1 rounded-md bg-blue-500 text-white">
+                            Add Review
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -195,6 +203,43 @@
         </div>
     </div>
     @endif
+
+    @if($showReviewModal)
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="review-modal">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Add Your Review</h3>
+                <div class="mt-2 px-7 py-3">
+                    <form wire:submit.prevent="submitReview">
+                        <div class="mb-4">
+                            <label for="rating" class="block text-gray-700 text-sm font-bold mb-2">Rating:</label>
+                            <select wire:model="rating" id="rating" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">Select Rating</option>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <option value="{{ $i }}">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
+                                @endfor
+                            </select>
+                            @error('rating') <span class="text-red-500">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="comment" class="block text-gray-700 text-sm font-bold mb-2">Comment:</label>
+                            <textarea wire:model="comment" id="comment" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
+                            @error('comment') <span class="text-red-500">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Submit Review
+                            </button>
+                            <button type="button" wire:click="$set('showReviewModal', false)" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <script>
@@ -207,3 +252,30 @@
         document.body.innerHTML = originalContents;
     }
 </script>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.addEventListener('swal:success', event => {
+        Swal.fire({
+            title: event.detail.title,
+            text: event.detail.text,
+            icon: event.detail.icon,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+    });
+
+    window.addEventListener('swal:error', event => {
+        Swal.fire({
+            title: event.detail.title,
+            text: event.detail.text,
+            icon: 'error',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+    });
+</script>
+@endpush
+
+<!-- ... rest of your Blade template ... -->

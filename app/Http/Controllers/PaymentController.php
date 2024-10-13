@@ -61,6 +61,8 @@ class PaymentController extends Controller
             'billing_address_id' => $selectedAddress->id,
             'shipping_address_id' => $selectedAddress->id,
             'notes' => session('order_notes'),
+            'payment_method' => session('payment_method'),
+            'shipping_option' => session('shipping_option'),
         ]);
 
         // Create order items
@@ -71,6 +73,13 @@ class PaymentController extends Controller
                 'quantity' => $item['quantity'],
                 'price' => $item['price'],
             ]);
+
+            // Update product stock
+            $product = Product::find($productId);
+            if ($product) {
+                $product->stock_quantity -= $item['quantity'];
+                $product->save();
+            }
         }
 
         $orderDetails = [
@@ -117,48 +126,5 @@ class PaymentController extends Controller
         return $subtotal + $tax + $deliveryFee - $discount;
     }
 
-    public function sendTestEmail()
-    {
-        // Create a dummy user
-        $user = new User([
-            'name' => 'Test User',
-            'email' => 'test@example.com'
-        ]);
-
-        // Create dummy order details
-        $orderDetails = [
-            'items' => [
-                [
-                    'name' => 'Test Product 1',
-                    'quantity' => 2,
-                    'price' => 100.00
-                ],
-                [
-                    'name' => 'Test Product 2',
-                    'quantity' => 1,
-                    'price' => 50.00
-                ]
-            ],
-            'subtotal' => 250.00,
-            'tax' => 25.00,
-            'deliveryFee' => 10.00,
-            'discount' => 5.00,
-            'total' => 280.00,
-            'shippingAddress' => (object) [
-                'address_line_1' => '123 Test Street',
-                'address_line_2' => 'Apt 4B',
-                'city' => 'Test City',
-                'state' => 'Test State',
-                'postal_code' => '12345',
-                'country' => 'Test Country'
-            ],
-            'paymentMethod' => 'credit card',
-            'shippingOption' => 'standard'
-        ];
-
-        // Send the test email
-        Mail::to('recipient@example.com')->send(new OrderInvoice($user, $orderDetails));
-
-        return 'Test order invoice email sent successfully!';
-    }
+   
 }

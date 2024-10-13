@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'processing', 'completed', 'cancelled', 'refunded'])->default('pending');
             $table->foreign('billing_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
             $table->foreign('shipping_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
+            $table->string('shipping_option')->nullable();
             $table->string('payment_method')->nullable();
             $table->text('notes')->nullable();
             $table->softDeletes();

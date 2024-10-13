@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class ListProduct extends Component
 {
@@ -195,5 +196,10 @@ class ListProduct extends Component
             'icon' => 'success',
             'timer' => 3000,
         ]);
+    }
+
+    public function redirectToProduct($slug)
+    {
+        return Redirect::route('product-profile', ['slug' => $slug]);
     }
 }

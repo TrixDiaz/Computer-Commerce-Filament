@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
+
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
@@ -27,6 +29,7 @@ class Product extends Model
         'is_best_seller',
         'is_top_rated',
         'is_on_sale',
+        'images',   
     ];
 
     protected $casts = [
@@ -74,5 +77,15 @@ class Product extends Model
     public function getOriginalPriceAttribute($value)
     {
         return $value ?? $this->price;
+    }
+
+    public function getImagesUrlAttribute()
+    {
+        if (is_array($this->images)) {
+            return array_map(function ($image) {
+                return Storage::url($image);
+            }, $this->images);
+        }
+        return $this->images ? Storage::url($this->images) : null;
     }
 }

@@ -46,7 +46,7 @@ class ProductSeeder extends Seeder
                 'brand_id' => Brand::inRandomOrder()->first()->id,
                 'category_id' => Category::inRandomOrder()->first()->id,
                 'is_active' => true,
-                'images' => json_encode(['default.jpg']),
+                'images' => null,
             ]));
         }
     }

@@ -63,21 +63,26 @@
                 @foreach($products as $product)
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <!-- Product card content -->
-                    <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="block">
+                    <div class="block">
                         <div class="h-56 w-full relative group">
                             @php
-                            $images = json_decode($product->images, true);
                             $defaultImage = '/images/laptop-image.png';
-                            $hoverImage = '/images/hover-image.png';
-                            $mainImage = $images && !empty($images) ? $images[0] : $defaultImage;
+                            $defaultHoverImage = '/images/hover-image.png';
+                            $images = $product->images ?? [];
+                            $mainImage = !empty($images) ? $images[array_rand($images)] : $defaultImage;
+                            $hoverImage = !empty($images) ? $images[array_rand($images)] : $defaultHoverImage;
+                            // Ensure hover image is different from main image if possible
+                            while (!empty($images) && count($images) > 1 && $hoverImage === $mainImage) {
+                                $hoverImage = $images[array_rand($images)];
+                            }
                             @endphp
                             <img
                                 class="mx-auto h-full w-full object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0"
-                                src="{{ asset($mainImage) }}"
+                                src="{{ !empty($images) ? Storage::url($mainImage) : asset($defaultImage) }}"
                                 alt="{{ $product->name }}" />
                             <img
                                 class="mx-auto h-full w-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"
-                                src="{{ asset($hoverImage) }}"
+                                src="{{ !empty($images) ? Storage::url($hoverImage) : asset($defaultHoverImage) }}"
                                 alt="{{ $product->name }} - Hover" />
                         </div>
 
@@ -90,7 +95,7 @@
                                 @endif
                             </div>
 
-                            <h3 class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{{ $product->name }}</h3>
+                            <h3 wire:click="redirectToProduct('{{ $product->slug }}')" class="text-lg font-semibold leading-tight text-gray-900 hover:cursor-pointer hover:text-blue-600 dark:text-white">{{ $product->name }}</h3>
 
                             <div class="mt-2 flex items-center gap-2">
                                 <div class="flex items-center">
@@ -154,7 +159,7 @@
                                 </button>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
                 @endforeach
             </div>

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, SoftDeletes, HasRoles;
@@ -62,7 +63,7 @@ class User extends Authenticatable implements FilamentUser
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->first_name . ' ' . $this->last_name,
+            get: fn () => $this->first_name . ' ' . $this->last_name,
         );
     }
 

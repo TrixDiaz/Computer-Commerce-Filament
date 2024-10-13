@@ -185,8 +185,6 @@ class BrandResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable(),
                 Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Active')
                     ->onIcon('heroicon-m-bolt')

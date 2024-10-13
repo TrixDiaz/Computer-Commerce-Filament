@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\Promotion;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,18 +19,51 @@ class PromotionRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product_id')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make()->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Name')
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpanFull(),
+                    Forms\Components\Select::make('type')
+                        ->required()
+                        ->options([
+                            'percentage' => 'Percentage',
+                            'fixed' => 'Fixed',
+                        ]),
+                    Forms\Components\TextInput::make('value')
+                        ->required()
+                        ->numeric(),
+                    Forms\Components\DatePicker::make('start_date')
+                        ->required()
+                        ->native(false),
+                    Forms\Components\DatePicker::make('end_date')
+                        ->required()
+                        ->native(false),
+                    Forms\Components\Textarea::make('description')
+                        ->required()
+                        ->columnSpanFull(),
+                ])->columns(2),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('product_id')
+            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('product_id'),
+                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\TextColumn::make('type'),
+                Tables\Columns\TextColumn::make('value'),
+                Tables\Columns\TextColumn::make('start_date')
+                    ->label('Start Date')
+                    ->date('F j, Y')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('end_date')
+                    ->label('End Date')
+                    ->date('F j, Y')
+                    ->sortable(),
             ])
             ->filters([
                 //

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('SET NULL');
             $table->foreign('promotion_id')->references('id')->on('promotions')->onDelete('SET NULL');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

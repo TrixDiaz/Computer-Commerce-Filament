@@ -30,53 +30,186 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('brand_id')
-                    ->numeric()
-                    ->default(null),
-                Forms\Components\TextInput::make('category_id')
-                    ->numeric()
-                    ->default(null),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('price')
-                    ->required()
-                    ->numeric()
-                    ->prefix('$'),
-                Forms\Components\TextInput::make('stock_quantity')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('sku')
-                    ->label('SKU')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
-                Forms\Components\Textarea::make('images')
-                    ->columnSpanFull(),
-            ]);
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\Section::make()->description('Product Information')->schema([
+                        Forms\Components\Select::make('brand_id')
+                            ->label('Brand')
+                            ->relationship('brand', 'name')
+                            ->searchable()
+                            ->default(null),
+                        Forms\Components\Select::make('category_id')
+                            ->label('Category')
+                            ->relationship('category', 'name')
+                            ->searchable()
+                            ->default(null),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('price')
+                            ->required()
+                            ->numeric()
+                            ->prefix('$'),
+                        Forms\Components\TextInput::make('stock_quantity')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\Textarea::make('description')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('images')
+                            ->label('Images')
+                            ->multiple()
+                            ->columnSpanFull(),
+                    ])->columns(2),
+                ])->columnSpan([
+                    'sm' => 3,
+                    'md' => 3,
+                    'lg' => 2
+                ]),
+
+
+                Forms\Components\Grid::make(1)->schema([
+
+                    Forms\Components\Section::make()->description('Status')->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Active')
+                            ->onIcon('heroicon-m-bolt')
+                            ->offIcon('heroicon-m-bolt-slash')
+                            ->required(),
+                    ]),
+
+                    Forms\Components\Section::make()->schema([
+                        Forms\Components\TextInput::make('sku')
+                            ->label('SKU')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
+                    Forms\Components\Section::make()->schema([
+                        Forms\Components\Placeholder::make('created_at')
+                            ->label('Created at')
+                            ->hiddenOn('create')
+                            ->content(function (\Illuminate\Database\Eloquent\Model $record): String {
+                                $category = Product::find($record->id);
+                                $now = \Carbon\Carbon::now();
+
+                                $diff = $category->created_at->diff($now);
+                                if ($diff->y > 0) {
+                                    return $diff->y . ' years ago';
+                                } elseif ($diff->m > 0) {
+                                    if ($diff->m == 1) {
+                                        return '1 month ago';
+                                    } else {
+                                        return $diff->m . ' months ago';
+                                    }
+                                } elseif ($diff->d >= 7) {
+                                    $weeks = floor($diff->d / 7);
+                                    if ($weeks == 1) {
+                                        return 'a week ago';
+                                    } else {
+                                        return $weeks . ' weeks ago';
+                                    }
+                                } elseif ($diff->d > 0) {
+                                    if ($diff->d == 1) {
+                                        return 'yesterday';
+                                    } else {
+                                        return $diff->d . ' days ago';
+                                    }
+                                } elseif ($diff->h > 0) {
+                                    if ($diff->h == 1) {
+                                        return '1 hour ago';
+                                    } else {
+                                        return $diff->h . ' hours ago';
+                                    }
+                                } elseif ($diff->i > 0) {
+                                    if ($diff->i == 1) {
+                                        return '1 minute ago';
+                                    } else {
+                                        return $diff->i . ' minutes ago';
+                                    }
+                                } elseif ($diff->s > 0) {
+                                    if ($diff->s == 1) {
+                                        return '1 second ago';
+                                    } else {
+                                        return $diff->s . ' seconds ago';
+                                    }
+                                } else {
+                                    return 'just now';
+                                }
+                            }),
+                        Forms\Components\Placeholder::make('updated_at')
+                            ->label('Last modified at')
+                            ->content(function (\Illuminate\Database\Eloquent\Model $record): String {
+                                $category = Product::find($record->id);
+                                $now = \Carbon\Carbon::now();
+
+                                $diff = $category->updated_at->diff($now);
+                                if ($diff->y > 0) {
+                                    return $diff->y . ' years ago';
+                                } elseif ($diff->m > 0) {
+                                    if ($diff->m == 1) {
+                                        return '1 month ago';
+                                    } else {
+                                        return $diff->m . ' months ago';
+                                    }
+                                } elseif ($diff->d >= 7) {
+                                    $weeks = floor($diff->d / 7);
+                                    if ($weeks == 1) {
+                                        return 'a week ago';
+                                    } else {
+                                        return $weeks . ' weeks ago';
+                                    }
+                                } elseif ($diff->d > 0) {
+                                    if ($diff->d == 1) {
+                                        return 'yesterday';
+                                    } else {
+                                        return $diff->d . ' days ago';
+                                    }
+                                } elseif ($diff->h > 0) {
+                                    if ($diff->h == 1) {
+                                        return '1 hour ago';
+                                    } else {
+                                        return $diff->h . ' hours ago';
+                                    }
+                                } elseif ($diff->i > 0) {
+                                    if ($diff->i == 1) {
+                                        return '1 minute ago';
+                                    } else {
+                                        return $diff->i . ' minutes ago';
+                                    }
+                                } elseif ($diff->s > 0) {
+                                    if ($diff->s == 1) {
+                                        return '1 second ago';
+                                    } else {
+                                        return $diff->s . ' seconds ago';
+                                    }
+                                } else {
+                                    return 'just now';
+                                }
+                            }),
+                    ])->hiddenOn('create'),
+                ])->columnSpan([
+                    'sm' => 3,
+                    'md' => 3,
+                    'lg' => 1
+                ]),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('brand_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('brand.name')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('category.name')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
+                    ->searchable()
+                    ->description(fn($record) => $record->slug),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
@@ -86,8 +219,12 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Active')
+                    ->onIcon('heroicon-m-bolt')
+                    ->offIcon('heroicon-m-bolt-slash')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -98,10 +235,25 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('is_active')
+                    ->label('Status')
+                    ->options([
+                        '1' => 'Active',
+                        '0' => 'Inactive',
+                    ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()->color('info'),
+                    Tables\Actions\EditAction::make()->color('primary'),
+                    Tables\Actions\DeleteAction::make()->label('Archive'),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make()->label('Permanent Delete'),
+                ])
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->tooltip('Actions')
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

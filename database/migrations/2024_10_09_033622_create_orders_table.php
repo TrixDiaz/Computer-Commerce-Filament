@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreign('shipping_address_id')->references('id')->on('addresses')->onDelete('SET NULL');
             $table->string('payment_method')->nullable();
             $table->text('notes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

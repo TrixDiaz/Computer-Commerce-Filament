@@ -1,6 +1,10 @@
 <div>
     <section class="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
         <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+            <!-- Pagination -->
+            <div class="mt-4">
+                {{ $products->links() }}
+            </div>
             <!-- Heading & Filters -->
             <div class="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
                 <div>
@@ -80,9 +84,9 @@
                         <div class="pt-6">
                             <div class="mb-4 flex items-center justify-between gap-4">
                                 @if($product->is_on_sale)
-                                    <span class="me-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        Up to {{ number_format((1 - $product->price / $product->original_price) * 100, 0) }}% off
-                                    </span>
+                                <span class="me-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                    Up to {{ number_format((1 - $product->price / $product->original_price) * 100, 0) }}% off
+                                </span>
                                 @endif
                             </div>
 
@@ -135,13 +139,13 @@
                                 <div>
                                     <p class="text-2xl font-bold leading-tight text-gray-900 dark:text-white">₱{{ number_format($product->price, 2) }}</p>
                                     @if($product->is_on_sale)
-                                        <p class="text-sm text-gray-500 line-through dark:text-gray-400">₱{{ number_format($product->original_price, 2) }}</p>
+                                    <p class="text-sm text-gray-500 line-through dark:text-gray-400">₱{{ number_format($product->original_price, 2) }}</p>
                                     @endif
                                 </div>
 
-                                <button 
-                                    wire:click="addToCart({{ $product->id }})" 
-                                    type="button" 
+                                <button
+                                    wire:click="addToCart({{ $product->id }})"
+                                    type="button"
                                     class="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                     <svg class="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6" />

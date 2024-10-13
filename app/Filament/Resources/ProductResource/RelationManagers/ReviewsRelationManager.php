@@ -27,9 +27,21 @@ class ReviewsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('product_id')
+            ->recordTitleAttribute('Review')
             ->columns([
-                Tables\Columns\TextColumn::make('product_id'),
+                Tables\Columns\TextColumn::make('product.name'),
+                Tables\Columns\TextColumn::make('user_id'),
+                Tables\Columns\TextColumn::make('rating'),
+                Tables\Columns\TextColumn::make('comment'),
+                Tables\Columns\ToggleColumn::make('is_approved')
+                    ->label('Approved')
+                    ->onIcon('heroicon-m-check-circle')
+                    ->offIcon('heroicon-m-x-circle')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -38,7 +50,7 @@ class ReviewsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

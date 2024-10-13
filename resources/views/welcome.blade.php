@@ -118,10 +118,11 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 
     <!-- Custom Chat Widget -->
-    <div x-data="chatWidget()" x-cloak class="fixed bottom-4 right-4">
+    <div x-data="chatWidget()" x-cloak>
         <!-- Toggle Button -->
         <button @click="toggleChat()" 
-                class="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                x-show="!isDriftVisible"
+                class="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <svg x-show="!isOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
             </svg>
@@ -131,14 +132,14 @@
         </button>
 
         <!-- Chat Widget -->
-        <div x-show="isOpen" 
+        <div x-show="isOpen && !isDriftVisible" 
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-90"
              x-transition:enter-end="opacity-100 scale-100"
              x-transition:leave="transition ease-in duration-300"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-90"
-             class="absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-xl overflow-hidden">
+             class="fixed bottom-20 right-4 w-80 bg-white rounded-lg shadow-xl overflow-hidden">
             <div class="bg-blue-500 text-white p-4">
                 <h3 class="font-bold">Virtual Assistant</h3>
             </div>
@@ -165,6 +166,7 @@
         function chatWidget() {
             return {
                 isOpen: false,
+                isDriftVisible: false,
                 chatHistory: '',
                 userInput: '',
                 questions: [
@@ -177,8 +179,26 @@
                 init() {
                     this.addMessage('bot', "Hello! How can I assist you today? Here are some options:");
                     this.showQuestions();
+                    
+                    // Listen for Drift events
+                    if (window.drift) {
+                        drift.on('ready', (api) => {
+                            api.widget.hide();
+                        });
+                        drift.on('widgetOpen', () => {
+                            this.isDriftVisible = true;
+                            this.isOpen = false;
+                        });
+                        drift.on('widgetClosed', () => {
+                            this.isDriftVisible = false;
+                        });
+                    }
                 },
                 toggleChat() {
+                    if (this.isDriftVisible) {
+                        drift.api.widget.hide();
+                        this.isDriftVisible = false;
+                    }
                     this.isOpen = !this.isOpen;
                 },
                 addMessage(sender, message) {
@@ -232,9 +252,12 @@
                 },
                 activateLiveChat() {
                     this.addMessage('bot', "Certainly! I'm connecting you with a live person now. Please wait a moment.");
-                    // Activate Drift chat
                     if (window.drift) {
-                        window.drift.api.showWelcomeMessage();
+                        this.isOpen = false;
+                        setTimeout(() => {
+                            window.drift.api.showWelcomeMessage();
+                            this.isDriftVisible = true;
+                        }, 500);
                     } else {
                         this.addMessage('bot', "I'm sorry, but the live chat system is currently unavailable. Please try again later or use one of the other contact methods.");
                     }

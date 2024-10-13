@@ -5,9 +5,8 @@
 
                 <div class="flex items-center space-x-8">
                     <div class="shrink-0">
-                        <a href="#" title="" class="">
-                            <img class="block w-auto h-8 dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/logo-full.svg" alt="">
-                            <img class="hidden w-auto h-8 dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/logo-full-dark.svg" alt="">
+                        <a href="{{ route('home') }}" title="" class="text-xl font-bold">
+                           GamerGo
                         </a>
                     </div>
 
@@ -28,6 +27,33 @@
                             </a>
                         </li>
                     </ul>
+                </div>
+
+                <!-- Updated search bar -->
+                <div class="flex-1 max-w-xl mx-4">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            wire:model.live="search"
+                            class="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:border-blue-500 focus:outline-none focus:ring"
+                            placeholder="Search products..."
+                        >
+                        @if(!empty($searchResults))
+                            <div class="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-gray-800 max-h-96 overflow-y-auto">
+                                @forelse($searchResults as $product)
+                                    <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <img src="{{ $product->images_url[0] ?? asset('path/to/placeholder-image.jpg') }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-md mr-4">
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ $product->name }}</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">₱{{ number_format($product->price, 2) }}</p>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No results found</div>
+                                @endforelse
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-end lg:space-x-2">

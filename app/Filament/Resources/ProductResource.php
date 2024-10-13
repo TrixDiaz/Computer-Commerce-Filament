@@ -41,6 +41,7 @@ class ProductResource extends Resource
                             ->label('Category')
                             ->relationship('category', 'name')
                             ->searchable()
+                            ->preload()
                             ->default(null),
                         Forms\Components\TextInput::make('name')
                             ->required()

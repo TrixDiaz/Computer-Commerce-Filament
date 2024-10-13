@@ -4,16 +4,21 @@ namespace App\Livewire;
 
 use App\Livewire\Actions\Logout;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\DatabaseNotification;
 
 class Navigation extends Component
 {
     public $cartCount = 0;
+    public $notifications = [];
+    public $unreadNotificationsCount = 0;
 
     protected $listeners = ['cartUpdated' => 'updateCartCount'];
 
     public function mount()
     {
         $this->updateCartCount();
+        $this->loadNotifications();
     }
 
     public function updateCartCount()
@@ -42,6 +47,31 @@ class Navigation extends Component
         $logout();
 
         $this->redirect('/', navigate: true);
+    }
+
+    public function loadNotifications()
+    {
+        if (Auth::check()) {
+            $this->notifications = Auth::user()->notifications()->latest()->take(5)->get();
+            $this->unreadNotificationsCount = Auth::user()->unreadNotifications()->count();
+        }
+    }
+
+    public function markAsRead($notificationId)
+    {
+        $notification = DatabaseNotification::find($notificationId);
+        if ($notification && $notification->notifiable_id === Auth::id()) {
+            $notification->markAsRead();
+            $this->loadNotifications();
+        }
+    }
+
+    public function markAllAsRead()
+    {
+        if (Auth::check()) {
+            Auth::user()->unreadNotifications->markAsRead();
+            $this->loadNotifications();
+        }
     }
 
     public function render()

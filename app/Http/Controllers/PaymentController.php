@@ -11,15 +11,14 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 
 class PaymentController extends Controller
 {
     public function handlePaymentSuccess(Request $request)
     {
         // Create order and send invoice email
-        // $order = $this->createOrderAndSendInvoice();
-        $order = null;
+        $order = $this->createOrderAndSendInvoice();
+
         if (!$order) {
             // Handle the case where order creation failed
             session()->flash('swal:error', [
@@ -41,17 +40,18 @@ class PaymentController extends Controller
         session()->forget(['cart', 'selected_address_id', 'discount', 'payment_method', 'shipping_option']);
 
         // Create Filament notification
-        auth()->user()->notify(
             Notification::make()
                 ->success()
                 ->title('Order Placed Successfully')
                 ->body("Your order #{$order->order_number} has been placed successfully.")
-                ->actions([
-                    Action::make('view')
-                        ->button()
-                        ->url(route('filament.resources.orders.view', $order))
-                ])
-        );
+                ->sendToDatabase(Auth::user());
+            
+                Notification::make()
+                ->success()
+                ->title('Order Placed Successfully')
+                ->body("Order #{$order->order_number} has been placed successfully.")
+                ->sendToDatabase(User::find(1));
+        
 
         return redirect()->route('home')->with('success', 'Payment successful!');
     }
@@ -152,4 +152,6 @@ class PaymentController extends Controller
 
         return $subtotal + $tax + $deliveryFee - $discount;
     }
+
+   
 }

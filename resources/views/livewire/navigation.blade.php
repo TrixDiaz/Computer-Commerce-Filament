@@ -72,11 +72,18 @@
                             <div class="py-2">
                                 <div class="px-4 py-2 bg-gray-100 border-b flex justify-between items-center">
                                     <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
-                                    @if($unreadNotificationsCount > 0)
-                                        <button wire:click="markAllAsRead" class="text-xs text-blue-600 hover:text-blue-800">
-                                            Mark all as read
-                                        </button>
-                                    @endif
+                                    <div>
+                                        @if($unreadNotificationsCount > 0)
+                                            <button wire:click="markAllAsRead" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
+                                                Mark all as read
+                                            </button>
+                                        @endif
+                                        @if(count($notifications) > 0)
+                                            <button wire:click="clearAllNotifications" class="text-xs text-red-600 hover:text-red-800">
+                                                Clear all
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
                                 
                                 @forelse($notifications as $notification)
@@ -100,11 +107,16 @@
                                                     {{ $notification->created_at->diffForHumans() }}
                                                 </p>
                                             </div>
-                                            @if(!$notification->read_at)
-                                                <button wire:click="markAsRead('{{ $notification->id }}')" class="text-xs text-blue-600 hover:text-blue-800">
-                                                    Mark as read
+                                            <div>
+                                                @if(!$notification->read_at)
+                                                    <button wire:click="markAsRead('{{ $notification->id }}')" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
+                                                        Mark as read
+                                                    </button>
+                                                @endif
+                                                <button wire:click="clearNotification('{{ $notification->id }}')" class="text-xs text-red-600 hover:text-red-800">
+                                                    Clear
                                                 </button>
-                                            @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @empty

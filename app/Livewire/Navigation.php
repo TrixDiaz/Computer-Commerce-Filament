@@ -74,6 +74,29 @@ class Navigation extends Component
         }
     }
 
+    public function clearNotification($notificationId)
+    {
+        $notification = DatabaseNotification::find($notificationId);
+        if ($notification && $notification->notifiable_id === Auth::id()) {
+            $notification->delete();
+            $this->loadNotifications();
+            $this->dispatch('showAlert', [
+                ['type' => 'success', 'message' => 'Notification cleared successfully.']
+            ]);
+        }
+    }
+
+    public function clearAllNotifications()
+    {
+        if (Auth::check()) {
+            Auth::user()->notifications()->delete();
+            $this->loadNotifications();
+            $this->dispatch('showAlert', [
+                ['type' => 'success', 'message' => 'All notifications cleared successfully.']
+            ]);
+        }
+    }
+
     public function render()
     {
         return view('livewire.navigation');

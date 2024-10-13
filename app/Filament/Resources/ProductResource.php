@@ -44,14 +44,27 @@ class ProductResource extends Resource
                             ->default(null),
                         Forms\Components\TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->unique(Product::class, 'name', ignoreRecord: true)
+                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                                /*if ($operation !== 'create') {
+                                return;
+                            }*/
+
+                                $set('slug', \Illuminate\Support\Str::slug($state));
+                            }),
+
                         Forms\Components\TextInput::make('slug')
+                            ->disabled()
+                            ->dehydrated()
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->unique(Product::class, 'slug', ignoreRecord: true),
                         Forms\Components\TextInput::make('price')
                             ->required()
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix('₱'),
                         Forms\Components\TextInput::make('stock_quantity')
                             ->required()
                             ->numeric(),
@@ -63,12 +76,12 @@ class ProductResource extends Resource
                             ->multiple()
                             ->columnSpanFull(),
                     ])->columns(2),
-                ])->columnSpan([
-                    'sm' => 3,
-                    'md' => 3,
-                    'lg' => 2
-                ]),
-
+                ])
+                    ->columnSpan([
+                        'sm' => 3,
+                        'md' => 3,
+                        'lg' => 2
+                    ]),
 
                 Forms\Components\Grid::make(1)->schema([
 
@@ -211,7 +224,7 @@ class ProductResource extends Resource
                     ->searchable()
                     ->description(fn($record) => $record->slug),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
+                    ->money('PHP')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->numeric()

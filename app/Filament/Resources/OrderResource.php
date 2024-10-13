@@ -51,7 +51,7 @@ class OrderResource extends Resource
                                 ->default(null),
                             Forms\Components\Select::make('shipping_address_id')
                                 ->label('Shipping Address')
-                                ->relationship('shippingAddress', 'name')
+                                ->relationship('shippingAddress', 'address_line_1')
                                 ->searchable()
                                 ->preload()
                                 ->default(null),

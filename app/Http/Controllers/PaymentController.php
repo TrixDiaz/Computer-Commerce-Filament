@@ -75,6 +75,7 @@ class PaymentController extends Controller
 
         $orderDetails = [
             'items' => $cartItems,
+            'orderNumber' => $order->order_number,
             'subtotal' => $this->calculateSubtotal($cartItems),
             'tax' => $this->calculateTax($cartItems),
             'deliveryFee' => $this->calculateDeliveryFee(),

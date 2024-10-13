@@ -16,7 +16,7 @@
     <div class="container">
         <h1>Order Invoice</h1>
         <p>Dear {{ $user->name }},</p>
-        <p>Thank you for your order. Here are the details of your purchase:</p>
+        <p>Thank you for your order. Your order number is: <strong>{{ $orderDetails['orderNumber'] }}</strong></p>
 
         <h2>Order Summary</h2>
         <table>

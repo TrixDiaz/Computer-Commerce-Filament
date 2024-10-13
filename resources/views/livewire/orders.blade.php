@@ -71,6 +71,10 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="mt-4">
+        {{ $orders->links() }}
+    </div>
     @endif
 
     @if($selectedOrder)

@@ -4,10 +4,15 @@ namespace App\Livewire;
 
 use App\Models\Order;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Orders extends Component
 {
-    public $orders;
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
+
+    public $perPage = 10;
     public $selectedOrder;
     public $showInvoice = false;
     public $showCancelConfirmation = false;
@@ -17,7 +22,7 @@ class Orders extends Component
 
     public function mount()
     {
-        $this->orders = auth()->user()->orders()->latest()->get();
+        // Remove any initialization of $this->orders
     }
 
     public function confirmCancelOrder($orderId)
@@ -79,6 +84,7 @@ class Orders extends Component
 
     public function render()
     {
-        return view('livewire.orders');
+        $orders = auth()->user()->orders()->latest()->paginate($this->perPage);
+        return view('livewire.orders', ['orders' => $orders]);
     }
 }

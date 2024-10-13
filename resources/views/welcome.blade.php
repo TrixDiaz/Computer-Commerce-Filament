@@ -163,8 +163,8 @@
     </div>
 
     <script>
-        function chatWidget() {
-            return {
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('chatWidget', () => ({
                 isOpen: false,
                 isDriftVisible: false,
                 chatHistory: '',
@@ -262,8 +262,8 @@
                         this.addMessage('bot', "I'm sorry, but the live chat system is currently unavailable. Please try again later or use one of the other contact methods.");
                     }
                 }
-            }
-        }
+            }))
+        })
     </script>
 
     @livewireScripts

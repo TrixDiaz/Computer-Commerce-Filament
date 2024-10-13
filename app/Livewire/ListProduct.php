@@ -98,12 +98,12 @@ class ListProduct extends Component
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        if ($this->selectedCategory) {
-            $query->where('category_id', $this->selectedCategory);
+        if (!empty($this->selectedCategories)) {
+            $query->whereIn('category_id', $this->selectedCategories);
         }
 
-        if ($this->selectedBrand) {
-            $query->where('brand_id', $this->selectedBrand);
+        if (!empty($this->selectedBrands)) {
+            $query->whereIn('brand_id', $this->selectedBrands);
         }
 
         if ($this->minPrice !== null) {
@@ -114,13 +114,47 @@ class ListProduct extends Component
             $query->where('price', '<=', $this->maxPrice);
         }
 
+        if ($this->onSale) {
+            $query->where('is_on_sale', true);
+        }
+
+        if ($this->isNew) {
+            $query->where('is_new', true);
+        }
+
+        if ($this->isBestSeller) {
+            $query->where('is_best_seller', true);
+        }
+
+        if ($this->isTopRated) {
+            $query->where('is_top_rated', true);
+        }
+
         // Apply sorting
-        if ($this->sortBy === 'price_asc') {
-            $query->orderBy('price', 'asc');
-        } elseif ($this->sortBy === 'price_desc') {
-            $query->orderBy('price', 'desc');
-        } elseif ($this->sortBy === 'newest') {
-            $query->orderBy('created_at', 'desc');
+        switch ($this->sort) {
+            case 'random':
+                $query->inRandomOrder();
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'created_asc':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'created_desc':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
         }
 
         return view('livewire.list-product', [

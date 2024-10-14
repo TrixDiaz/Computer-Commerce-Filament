@@ -11,7 +11,7 @@
                 <img class="hidden dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/girl-shopping-list-dark.svg" alt="shopping illustration" />
             </div>
         </div>
-        <div class="mx-auto grid max-w-screen-xl place-content-center place-items-center grid-cols-2 gap-8 text-gray-500 dark:text-gray-400 sm:grid-cols-3 sm:gap-12 lg:grid-cols-4 px-4">
+        <!-- <div class="mx-auto grid max-w-screen-xl place-content-center place-items-center grid-cols-2 gap-8 text-gray-500 dark:text-gray-400 sm:grid-cols-3 sm:gap-12 lg:grid-cols-4 px-4">
             <a href="#" class="flex items-center md:justify-center">
                 <svg class="h-8 hover:text-gray-900 dark:hover:text-white" viewBox="0 0 210 33" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -56,6 +56,6 @@
                         fill="currentColor" />
                 </svg>
             </a>
-        </div>
+        </div> -->
     </section>
 </div>

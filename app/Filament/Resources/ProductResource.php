@@ -35,12 +35,10 @@ class ProductResource extends Resource
                         Forms\Components\Select::make('brand_id')
                             ->label('Brand')
                             ->relationship('brand', 'name')
-                            ->searchable()
                             ->default(null),
                         Forms\Components\Select::make('category_id')
                             ->label('Category')
                             ->relationship('category', 'name')
-                            ->searchable()
                             ->preload()
                             ->default(null),
                         Forms\Components\TextInput::make('name')

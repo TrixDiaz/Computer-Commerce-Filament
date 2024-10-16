@@ -164,28 +164,30 @@
                     </button>
 
                     <div id="myCartDropdown1" class="hidden z-10 mx-auto max-w-sm space-y-4 overflow-hidden rounded-lg bg-white p-4 antialiased shadow-lg dark:bg-gray-800">
-                        @if(session()->has('cart'))
-                        @foreach(session('cart') as $id => $details)
-                        <div class="grid grid-cols-2">
-                            <div>
-                                <a href="{{ route('product-profile', ['slug' => $details['slug']]) }}" class="truncate text-sm font-semibold leading-none text-gray-900 dark:text-white hover:underline">{{ $details['name'] }}</a>
-                                <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">₱{{ number_format($details['price'], 2) }}</p>
-                            </div>
+                        @if(session()->has('cart') && is_array(session('cart')))
+                            @foreach(session('cart') as $id => $details)
+                                @if(is_array($details) && isset($details['name'], $details['price'], $details['quantity'], $details['slug']))
+                                    <div class="grid grid-cols-2">
+                                        <div>
+                                            <a href="{{ route('product-profile', ['slug' => $details['slug']]) }}" class="truncate text-sm font-semibold leading-none text-gray-900 dark:text-white hover:underline">{{ $details['name'] }}</a>
+                                            <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">₱{{ number_format($details['price'], 2) }}</p>
+                                        </div>
 
-                            <div class="flex items-center justify-end gap-6">
-                                <p class="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Qty: {{ $details['quantity'] }}</p>
+                                        <div class="flex items-center justify-end gap-6">
+                                            <p class="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Qty: {{ $details['quantity'] }}</p>
 
-                                <button wire:click="removeFromCart({{ $id }})" class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600">
-                                    <span class="sr-only">Remove</span>
-                                    <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd" d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L12 10.6 9.7 8.3Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        @endforeach
+                                            <button wire:click="removeFromCart({{ $id }})" class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600">
+                                                <span class="sr-only">Remove</span>
+                                                <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path fill-rule="evenodd" d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L12 10.6 9.7 8.3Z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
                         @else
-                        <p class="text-center text-gray-500 dark:text-gray-400">Your cart is empty</p>
+                            <p class="text-center text-gray-500 dark:text-gray-400">Your cart is empty</p>
                         @endif
 
                         <a href="{{ route('cart') }}" title="" class="mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" role="button">Proceed to Cart</a>

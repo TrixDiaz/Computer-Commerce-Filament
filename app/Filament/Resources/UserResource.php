@@ -92,6 +92,13 @@ class UserResource extends Resource
                     ]),
 
                 Forms\Components\Grid::make(1)->schema([
+                    Forms\Components\Section::make('User Roles')
+                    ->schema([
+                        Forms\Components\Select::make('roles')
+                        ->multiple()
+                            ->relationship('roles', 'name')
+                            ->preload(),
+                    ]),
                     Forms\Components\Section::make('User Image')
                         ->schema([
                             Forms\Components\FileUpload::make('image')

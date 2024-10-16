@@ -33,10 +33,11 @@
                     <p class="text-center text-gray-500">No image available</p>
                 </div>
             @endif
+            <livewire:motherboard  />
         </div>
 
         <!-- Product details -->
-        <div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
+        <div class="space-y-6 bg-white p-6 rounded-lg shadow-md h-fit">
             <div class="flex justify-between items-center">
                 <p class="text-3xl font-semibold text-gray-800">₱{{ number_format($product->price, 2) }}</p>
                 <span class="px-3 py-1 text-sm font-semibold text-white bg-green-500 rounded-full">In Stock</span>

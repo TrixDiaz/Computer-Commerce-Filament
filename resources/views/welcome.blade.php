@@ -56,41 +56,8 @@
         }
     </style>
 
-    <!-- Drift Code (without automatic widget) -->
-    <script>
-        "use strict";
-
-        ! function() {
-            var t = window.driftt = window.drift = window.driftt || [];
-            if (!t.init) {
-                if (t.invoked) return void(window.console && console.error && console.error("Drift snippet included twice."));
-                t.invoked = !0, t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-                    t.factory = function(e) {
-                        return function() {
-                            var n = Array.prototype.slice.call(arguments);
-                            return n.unshift(e), t.push(n), t;
-                        };
-                    }, t.methods.forEach(function(e) {
-                        t[e] = t.factory(e);
-                    }), t.load = function(t) {
-                        var e = 3e5,
-                            n = Math.ceil(new Date() / e) * e,
-                            o = document.createElement("script");
-                        o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
-                        var i = document.getElementsByTagName("script")[0];
-                        i.parentNode.insertBefore(o, i);
-                    };
-            }
-        }();
-        drift.SNIPPET_VERSION = '0.3.1';
-        drift.load('va746htz54vz');
-
-        // Disable automatic widget display
-        drift.on('ready', function(api) {
-            api.widget.hide();
-        });
-    </script>
-
+    <!-- Add this line for CSRF token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body class="antialiased font-sans">
@@ -132,7 +99,6 @@
     <div x-data="chatWidget()" x-cloak>
         <!-- Toggle Button -->
         <button @click="toggleChat()"
-            x-show="!isDriftVisible"
             class="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <svg x-show="!isOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
@@ -143,7 +109,7 @@
         </button>
 
         <!-- Chat Widget -->
-        <div x-show="isOpen && !isDriftVisible"
+        <div x-show="isOpen"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
@@ -177,7 +143,6 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('chatWidget', () => ({
                 isOpen: false,
-                isDriftVisible: false,
                 chatHistory: '',
                 userInput: '',
                 questions: [
@@ -190,26 +155,8 @@
                 init() {
                     this.addMessage('bot', "Hello! How can I assist you today? Here are some options:");
                     this.showQuestions();
-
-                    // Listen for Drift events
-                    if (window.drift) {
-                        drift.on('ready', (api) => {
-                            api.widget.hide();
-                        });
-                        drift.on('widgetOpen', () => {
-                            this.isDriftVisible = true;
-                            this.isOpen = false;
-                        });
-                        drift.on('widgetClosed', () => {
-                            this.isDriftVisible = false;
-                        });
-                    }
                 },
                 toggleChat() {
-                    if (this.isDriftVisible) {
-                        drift.api.widget.hide();
-                        this.isDriftVisible = false;
-                    }
                     this.isOpen = !this.isOpen;
                 },
                 addMessage(sender, message) {
@@ -233,45 +180,23 @@
                     this.addMessage('user', userMessage);
                     this.userInput = '';
 
-                    if (userMessage === 'Chat with a live person') {
-                        this.activateLiveChat();
-                        return;
-                    }
-
-                    // Simulate bot response (replace with actual API call to BotMan in production)
-                    setTimeout(() => {
-                        let botResponse = "I'm sorry, I don't have an answer for that question. Here are some options:";
-                        if (this.questions.includes(userMessage)) {
-                            switch (userMessage) {
-                                case 'What services do you offer?':
-                                    botResponse = "We offer a wide range of services including web development, mobile app development, and digital marketing.";
-                                    break;
-                                case 'How can I contact support?':
-                                    botResponse = "You can contact our support team via email at support@example.com or call us at 1-800-123-4567.";
-                                    break;
-                                case 'What are your business hours?':
-                                    botResponse = "Our business hours are Monday to Friday, 9 AM to 5 PM EST.";
-                                    break;
-                                case 'Do you offer custom solutions?':
-                                    botResponse = "Yes, we provide custom solutions tailored to your specific needs. Please contact our sales team for more information.";
-                                    break;
-                            }
-                        }
-                        this.addMessage('bot', botResponse);
-                        this.showQuestions();
-                    }, 500);
-                },
-                activateLiveChat() {
-                    this.addMessage('bot', "Certainly! I'm connecting you with a live person now. Please wait a moment.");
-                    if (window.drift) {
-                        this.isOpen = false;
-                        setTimeout(() => {
-                            window.drift.api.showWelcomeMessage();
-                            this.isDriftVisible = true;
-                        }, 500);
-                    } else {
-                        this.addMessage('bot', "I'm sorry, but the live chat system is currently unavailable. Please try again later or use one of the other contact methods.");
-                    }
+                    // Send message to BotMan
+                    fetch('/botman', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ message: userMessage }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.addMessage('bot', data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.addMessage('bot', "I'm sorry, there was an error processing your request.");
+                    });
                 }
             }))
         })

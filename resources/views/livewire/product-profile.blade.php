@@ -101,7 +101,7 @@
                     <a href="{{ route('login') }}" 
                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-300 ease-in-out transform hover:scale-105">
                         Login to Add to Cart
-                    </a>
+                </a>
                     <a href="{{ route('login') }}" 
                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-300 ease-in-out transform hover:scale-105">
                         Login to Pay with GCash

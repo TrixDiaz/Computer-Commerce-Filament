@@ -92,6 +92,13 @@ class ProductResource extends Resource
                             ->required(),
                     ]),
 
+                    Forms\Components\Section::make('Model')->schema([
+                        Forms\Components\FileUpload::make('model')
+                            ->label('Model')
+                            ->disk('public')
+                            ->directory('models'),
+                    ]),
+
                     Forms\Components\Section::make()->schema([
                         Forms\Components\TextInput::make('sku')
                             ->label('SKU')

@@ -53,6 +53,8 @@ class ShoppingCart extends Component
             if ($this->addresses->isNotEmpty()) {
                 $this->selectedAddressId = $this->addresses->first()->id;
             }
+        } else {
+            $this->addresses = collect(); // Initialize as an empty collection if user is not authenticated
         }
     }
 
@@ -95,15 +97,16 @@ class ShoppingCart extends Component
 
     public function getUpdatedCart()
     {
-        $this->cartItems = session('cart', []);
-        foreach ($this->cartItems as $productId => &$item) {
+        $this->cartItems = collect(session('cart', []));
+        $this->cartItems->transform(function ($item, $productId) {
             $product = \App\Models\Product::find($productId);
             if ($product) {
                 $item['stock'] = $product->stock_quantity;
                 // Ensure the quantity doesn't exceed the stock
                 $item['quantity'] = min($item['quantity'], $item['stock']);
             }
-        }
+            return $item;
+        });
         $this->calculateTotal();
         $this->total = $this->subtotal + $this->tax + $this->deliveryFee - $this->discount;
     }
@@ -111,20 +114,20 @@ class ShoppingCart extends Component
     public function render()
     {
         return view('livewire.shopping-cart', [
-            'cartItems' => collect($this->cartItems), // Convert to collection
+            'cartItems' => collect($this->cartItems),
             'total' => $this->total,
             'subtotal' => $this->subtotal,
             'tax' => $this->tax,
             'deliveryFee' => $this->deliveryFee,
             'discount' => $this->discount,
-            'relatedProducts' => collect($this->relatedProducts), // Convert to collection
-            'addresses' => $this->addresses,
+            'relatedProducts' => collect($this->relatedProducts),
+            'addresses' => collect($this->addresses), // Ensure addresses is always a collection
         ]);
     }
 
     public function calculateTotal()
     {
-        $this->subtotal = array_reduce($this->cartItems, function ($carry, $item) {
+        $this->subtotal = $this->cartItems->reduce(function ($carry, $item) {
             return $carry + ($item['price'] * $item['quantity']);
         }, 0);
 
@@ -135,17 +138,18 @@ class ShoppingCart extends Component
 
     public function fetchRelatedProducts()
     {
-        if (empty($this->cartItems)) {
+        if ($this->cartItems->isEmpty()) {
             $this->relatedProducts = [];
             return;
         }
 
-        $categoryIds = array_unique(array_column($this->cartItems, 'category_id'));
-        $brandId = array_unique(array_column($this->cartItems, 'brand_id'));
+        $categoryIds = $this->cartItems->pluck('category_id')->unique()->toArray();
+        $brandIds = $this->cartItems->pluck('brand_id')->unique()->toArray();
+
         // Fetch related products from the database
         $this->relatedProducts = \App\Models\Product::whereIn('category_id', $categoryIds)
-            ->orWhere('brand_id', $brandId)
-            ->whereNotIn('id', array_keys($this->cartItems))
+            ->orWhereIn('brand_id', $brandIds)
+            ->whereNotIn('id', $this->cartItems->keys())
             ->inRandomOrder()
             ->limit(9)
             ->get()
@@ -154,13 +158,13 @@ class ShoppingCart extends Component
 
     public function updateQuantity($productId, $quantity)
     {
-        if (isset($this->cartItems[$productId])) {
+        if ($this->cartItems->has($productId)) {
             $product = \App\Models\Product::find($productId);
             if ($product) {
                 $maxQuantity = min($product->stock_quantity, max(1, $quantity));
                 $this->cartItems[$productId]['quantity'] = $maxQuantity;
                 $this->cartItems[$productId]['stock'] = $product->stock_quantity;
-                session(['cart' => $this->cartItems]);
+                session(['cart' => $this->cartItems->toArray()]);
                 $this->calculateTotal();
             }
         }
@@ -168,8 +172,8 @@ class ShoppingCart extends Component
 
     public function removeItem($productId)
     {
-        unset($this->cartItems[$productId]);
-        session(['cart' => $this->cartItems]);
+        $this->cartItems->forget($productId);
+        session(['cart' => $this->cartItems->toArray()]);
         $this->calculateTotal();
         $this->dispatch('swal:success', [
             'title' => 'Success!',
@@ -222,14 +226,14 @@ class ShoppingCart extends Component
         ]);
 
         // Add order items
-        foreach ($this->cartItems as $productId => $item) {
+        $this->cartItems->each(function ($item, $productId) use ($order) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $productId,
                 'quantity' => $item['quantity'],
                 'price' => $item['price'],
             ]);
-        }
+        });
 
         // Clear the cart session
         session()->forget('cart');
@@ -286,14 +290,14 @@ class ShoppingCart extends Component
         ]);
 
         // Add order items
-        foreach ($this->cartItems as $productId => $item) {
+        $this->cartItems->each(function ($item, $productId) use ($order) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $productId,
                 'quantity' => $item['quantity'],
                 'price' => $item['price'],
             ]);
-        }
+        });
 
         $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
             ->withHeader('Content-Type: application/json')
@@ -332,14 +336,14 @@ class ShoppingCart extends Component
 
     private function formatLineItems()
     {
-        return array_map(function ($item) {
+        return $this->cartItems->map(function ($item) {
             return [
                 'currency' => 'PHP',
                 'amount' => (int)($item['price'] * 100),
                 'name' => $item['name'],
                 'quantity' => $item['quantity'],
             ];
-        }, $this->cartItems);
+        })->values()->toArray();
     }
 
     public function selectAddress($addressId)

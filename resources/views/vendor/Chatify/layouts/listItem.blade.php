@@ -27,10 +27,13 @@
         <table class="messenger-list-item" data-contact="{{ $adminUser->id }}">
             <tr data-action="0">
                 {{-- Avatar side --}}
-                <td>
-                <div class="avatar av-m"
-                style="background-image: url('{{ $adminUser->avatar }}');">
-                </div>
+                <td style="position: relative">
+                    @if($adminUser->active_status)
+                        <span class="activeStatus"></span>
+                    @endif
+                    <div class="avatar av-m"
+                    style="background-image: url('{{ $adminUser->avatar }}');">
+                    </div>
                 </td>
                 {{-- center side --}}
                 <td>
@@ -38,7 +41,13 @@
                         {{ $adminUser->first_name . ' ' . $adminUser->last_name }}
                         <span>Admin</span>
                     </p>
-                    <span>Contact Admin</span>
+                    <span>
+                        @if($adminUser->active_status)
+                            Active
+                        @else
+                            Inactive
+                        @endif
+                    </span>
                 </td>
             </tr>
         </table>

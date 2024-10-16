@@ -53,10 +53,10 @@ class UserResource extends Resource
                                 ->timezone('Asia/Manila'),
                             Forms\Components\TextInput::make('password')
                                 ->password()
-                                ->required()
                                 ->maxLength(255)
                                 ->default('password')
                                 ->prefix('password')
+                                ->hiddenOn('edit')
                                 ->dehydrated(fn($state) => filled($state))
                                 ->suffixAction(
                                     Forms\Components\Actions\Action::make('togglePassword')

@@ -113,7 +113,9 @@
             @endguest
         </div>
 
-        <livewire:motherboard :modelPath="$modelPath" />
+        @if($modelPath)
+            <livewire:motherboard :modelPath="$modelPath" />
+        @endif
         <livewire:product-review :slug="$slug" />
     </div>
 </div>

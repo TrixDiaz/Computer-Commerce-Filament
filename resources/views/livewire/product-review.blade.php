@@ -1,10 +1,10 @@
 <div>
-    <section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+    <section class="bg-white p-8 antialiased dark:bg-gray-900">
         <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
             <div class="mx-auto max-w-5xl">
                 <div class="gap-4 sm:flex sm:items-center sm:justify-between">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Product Reviews</h2>
-                    <div class="mt-6 sm:mt-0">
+                    <!-- <div class="mt-6 sm:mt-0">
                         <label for="order-type" class="sr-only mb-2 block text-sm font-medium text-gray-900 dark:text-white">Select review type</label>
                         <select id="order-type" class="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500">
                             <option selected>All reviews</option>
@@ -14,7 +14,7 @@
                             <option value="2">2 stars</option>
                             <option value="1">1 star</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="mt-6 flow-root sm:mt-8">
@@ -44,7 +44,7 @@
                                             @endfor
                                         </dd>
                                     </dl>
-                                    <button id="actionsMenuDropdown1" data-dropdown-toggle="dropdownOrder1" type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <!-- <button id="actionsMenuDropdown1" data-dropdown-toggle="dropdownOrder1" type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                         <span class="sr-only"> Actions </span>
                                         <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-width="4" d="M6 12h.01m6 0h.01m5.99 0h.01"></path>
@@ -69,7 +69,7 @@
                                                 </button>
                                             </li>
                                         </ul>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         @empty

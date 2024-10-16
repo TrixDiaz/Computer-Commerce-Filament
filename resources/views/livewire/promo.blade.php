@@ -9,7 +9,7 @@
             </div>
             <div class="me-auto place-self-center lg:col-span-7">
                 <h1 class="mb-3 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-4xl">
-                    Save $500 today on your purchase <br />
+                    Save ₱500 today on your purchase <br />
                     of a new iMac computer.
                 </h1>
                 <p class="mb-6 text-gray-500 dark:text-gray-400">Reserve your new Apple iMac 27” today and enjoy exclusive savings with qualified activation. Pre-order now to secure your discount.</p>

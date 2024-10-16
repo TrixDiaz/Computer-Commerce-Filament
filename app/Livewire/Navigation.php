@@ -15,6 +15,7 @@ class Navigation extends Component
     public $unreadNotificationsCount = 0;
     public $search = '';
     public $searchResults = [];
+    public $relatedProducts = [];
 
     protected $listeners = ['cartUpdated' => 'updateCartCount'];
 
@@ -110,6 +111,19 @@ class Navigation extends Component
         } else {
             $this->searchResults = [];
         }
+    }
+
+    public function fetchRelatedProducts()
+    {
+        $this->relatedProducts = Product::inRandomOrder()->limit(3)->get()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'images' => $product->images ? $product->images[0] : null, // Assuming images is an array, take the first one
+            ];
+        })->toArray();
     }
 
     public function render()

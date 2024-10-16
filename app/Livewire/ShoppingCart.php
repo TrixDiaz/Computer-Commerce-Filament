@@ -110,7 +110,16 @@ class ShoppingCart extends Component
 
     public function render()
     {
-        return view('livewire.shopping-cart');
+        return view('livewire.shopping-cart', [
+            'cartItems' => collect($this->cartItems), // Convert to collection
+            'total' => $this->total,
+            'subtotal' => $this->subtotal,
+            'tax' => $this->tax,
+            'deliveryFee' => $this->deliveryFee,
+            'discount' => $this->discount,
+            'relatedProducts' => collect($this->relatedProducts), // Convert to collection
+            'addresses' => $this->addresses,
+        ]);
     }
 
     public function calculateTotal()

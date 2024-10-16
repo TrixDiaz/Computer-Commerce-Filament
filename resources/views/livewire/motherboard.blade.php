@@ -10,7 +10,7 @@
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x333333); // Lighter gray background
+            scene.background = new THREE.Color(0xE6E7EB); // Lighter gray background
 
             const container = document.getElementById('motherboard-container');
             const aspect = container.clientWidth / container.clientHeight;

@@ -8,9 +8,9 @@ class Motherboard extends Component
 {
     public $modelPath;
 
-    public function mount()
+    public function mount($modelPath = null)
     {
-        $this->modelPath = asset('models/window.glb');
+        $this->modelPath = $modelPath ?? asset('models/window.glb');
     }
 
     public function render()

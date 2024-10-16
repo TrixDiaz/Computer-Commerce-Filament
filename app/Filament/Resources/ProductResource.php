@@ -94,9 +94,11 @@ class ProductResource extends Resource
 
                     Forms\Components\Section::make('Model')->schema([
                         Forms\Components\FileUpload::make('model')
-                            ->label('Model')
+                            ->label('3D Model')
                             ->disk('public')
-                            ->directory('models'),
+                            ->directory('models')
+                            // ->acceptedFileTypes(['glb', 'gltf'])
+                            ->maxSize(50 * 1024), // 50MB max size
                     ]),
 
                     Forms\Components\Section::make()->schema([

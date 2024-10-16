@@ -33,7 +33,6 @@
                     <p class="text-center text-gray-500">No image available</p>
                 </div>
             @endif
-            <livewire:motherboard  />
         </div>
 
         <!-- Product details -->
@@ -113,5 +112,8 @@
                 <p class="mt-4 text-red-500 text-center">Please <a href="{{ route('login') }}" class="underline">login</a> to add items to your cart or make a purchase.</p>
             @endguest
         </div>
+
+        <livewire:motherboard :modelPath="$modelPath" />
+        <livewire:product-review :slug="$slug" />
     </div>
 </div>

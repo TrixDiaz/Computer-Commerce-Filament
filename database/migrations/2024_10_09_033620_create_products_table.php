@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('stock_quantity');
             $table->string('sku')->unique();
             $table->json('images')->nullable();
+            $table->string('model')->nullable();
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('SET NULL');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('SET NULL');
             $table->boolean('is_featured')->default(false);

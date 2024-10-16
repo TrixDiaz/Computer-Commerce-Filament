@@ -10,10 +10,14 @@ use Illuminate\Support\Facades\Session;
 class ProductProfile extends Component
 {
     public $product;
+    public $modelPath;
+    public $slug;
 
     public function mount($slug)
     {
+        $this->slug = $slug;
         $this->product = Product::where('slug', $slug)->firstOrFail();
+        $this->modelPath = $this->product->model ? asset('storage/' . $this->product->model) : null;
     }
 
     public function addToCart($productId)

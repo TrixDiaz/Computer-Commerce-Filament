@@ -22,6 +22,7 @@ class Product extends Model
         'is_active',
         'category_id',
         'brand_id',
+        'model',
         'is_featured',
         'is_active',
         'is_sale',

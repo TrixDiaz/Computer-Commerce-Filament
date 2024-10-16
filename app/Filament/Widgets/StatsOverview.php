@@ -4,6 +4,8 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
 class StatsOverview extends BaseWidget
 {
@@ -19,17 +21,28 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
+        $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)
+            ->sum('total_amount');
+
+        $newOrdersCount = Order::where('status', Order::STATUS_PENDING)
+            ->count();
+
+        $newCustomersCount = Order::select('user_id')
+            ->distinct()
+            ->whereDate('created_at', '>=', now()->subDays(30))
+            ->count();
+
         return [
-            Stat::make('Revenue', '₱192,100')
-                ->description('Total revenue')
+            Stat::make('Revenue', '₱' . number_format($totalRevenue, 2))
+                ->description('Total completed orders revenue')
                 ->descriptionIcon('heroicon-m-information-circle')
                 ->color('success'),
-            Stat::make('New Orders', '1,234')
-                ->description('Total new orders')
+            Stat::make('New Orders', $newOrdersCount)
+                ->description('Pending orders')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('danger'),
-            Stat::make('New Customers', '123')
-                ->description('Total new customers')
+            Stat::make('New Customers', $newCustomersCount)
+                ->description('In the last 30 days')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('warning'),
         ];

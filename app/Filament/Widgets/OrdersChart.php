@@ -7,6 +7,8 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
 class OrdersChart extends ApexChartWidget
 {
@@ -80,6 +82,8 @@ class OrdersChart extends ApexChartWidget
     {
         $filters = $this->filterFormData;
 
+        $ordersData = $this->getOrdersData();
+
         return [
             'chart' => [
                 'type' => $filters['ordersChartType'],
@@ -91,7 +95,7 @@ class OrdersChart extends ApexChartWidget
             'series' => [
                 [
                     'name' => 'Orders per month',
-                    'data' => [2433, 3454, 4566, 2342, 5545, 5765, 6787, 8767, 7565, 8576, 9686, 8996],
+                    'data' => $ordersData['counts'],
                 ],
             ],
             'plotOptions' => [
@@ -100,7 +104,7 @@ class OrdersChart extends ApexChartWidget
                 ],
             ],
             'xaxis' => [
-                'categories' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'categories' => $ordersData['months'],
                 'labels' => [
                     'style' => [
                         'fontWeight' => 400,
@@ -163,6 +167,34 @@ class OrdersChart extends ApexChartWidget
                     ],
                 ],
             ],
+        ];
+    }
+
+    protected function getOrdersData(): array
+    {
+        $data = Order::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->pluck('count', 'month')
+            ->all();
+
+        $months = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
+        $counts = array_map(function ($month) use ($data) {
+            return $data[$month] ?? 0;
+        }, range(1, 12));
+
+        return [
+            'months' => $months,
+            'counts' => $counts,
         ];
     }
 }

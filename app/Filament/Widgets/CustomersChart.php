@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 
 class CustomersChart extends ApexChartWidget
@@ -38,6 +40,8 @@ class CustomersChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
+        $customerData = $this->getCustomerData();
+
         return [
             'chart' => [
                 'type' => 'line',
@@ -49,11 +53,11 @@ class CustomersChart extends ApexChartWidget
             'series' => [
                 [
                     'name' => 'Customers',
-                    'data' => [4344, 5676, 6798, 7890, 8987, 9388, 10343, 10524, 13664, 14345, 15753, 16398],
+                    'data' => $customerData['counts'],
                 ],
             ],
             'xaxis' => [
-                'categories' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'categories' => $customerData['months'],
                 'labels' => [
                     'style' => [
                         'fontWeight' => 400,
@@ -99,6 +103,34 @@ class CustomersChart extends ApexChartWidget
                 'width' => 4,
             ],
             'colors' => ['#f59e0b'],
+        ];
+    }
+
+    protected function getCustomerData(): array
+    {
+        $data = Order::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(DISTINCT user_id) as count')
+        )
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->pluck('count', 'month')
+            ->all();
+
+        $months = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
+        $counts = array_map(function ($month) use ($data) {
+            return $data[$month] ?? 0;
+        }, range(1, 12));
+
+        return [
+            'months' => $months,
+            'counts' => $counts,
         ];
     }
 }

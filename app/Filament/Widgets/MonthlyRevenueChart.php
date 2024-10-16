@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Order;
 use Filament\Support\RawJs;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 
 class MonthlyRevenueChart extends ApexChartWidget
@@ -39,6 +41,8 @@ class MonthlyRevenueChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
+        $revenueData = $this->getRevenueData();
+
         return [
             'chart' => [
                 'type' => 'bar',
@@ -52,11 +56,11 @@ class MonthlyRevenueChart extends ApexChartWidget
             'series' => [
                 [
                     'name' => 'Earning',
-                    'data' => [270, 210, 180, 200, 250, 280, 250, 270, 150, 210, 180, 200],
+                    'data' => $revenueData['earnings'],
                 ],
                 [
                     'name' => 'Expense',
-                    'data' => [-140, -160, -180, -150, -100, -60, -80, -100, -180, -160, -180, -150],
+                    'data' => $revenueData['expenses'],
                 ],
             ],
             'plotOptions' => [
@@ -122,8 +126,8 @@ class MonthlyRevenueChart extends ApexChartWidget
                         'fontFamily' => 'inherit',
                     ],
                 ],
-                'min' => -200,
-                'max' => 300,
+                'min' => $revenueData['min'],
+                'max' => $revenueData['max'],
                 'tickAmount' => 5,
             ],
             'fill' => [
@@ -147,6 +151,47 @@ class MonthlyRevenueChart extends ApexChartWidget
         ];
     }
 
+    protected function getRevenueData(): array
+    {
+        $currentYear = now()->year;
+
+        $earnings = Order::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('SUM(total_amount) as total')
+        )
+            ->whereYear('created_at', $currentYear)
+            ->where('status', Order::STATUS_COMPLETED)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->pluck('total', 'month')
+            ->all();
+
+        // Simulate expenses as 40% of earnings (you should replace this with actual expense data)
+        $expenses = array_map(function ($earning) {
+            return -round($earning * 0.4);
+        }, $earnings);
+
+        $earningsData = array_map(function ($month) use ($earnings) {
+            return $earnings[$month] ?? 0;
+        }, range(1, 12));
+
+        $expensesData = array_map(function ($month) use ($expenses) {
+            return $expenses[$month] ?? 0;
+        }, range(1, 12));
+
+        $allValues = array_merge($earningsData, $expensesData);
+        $min = floor(min($allValues) / 100) * 100;
+        $max = ceil(max($allValues) / 100) * 100;
+
+        return [
+            'earnings' => $earningsData,
+            'expenses' => $expensesData,
+            'min' => $min,
+            'max' => $max,
+        ];
+    }
+
     protected function extraJsOptions(): ?RawJs
     {
         return RawJs::make(<<<'JS'
@@ -161,18 +206,18 @@ class MonthlyRevenueChart extends ApexChartWidget
             yaxis: {
                 labels: {
                     formatter: function (val, index) {
-                        return '$' + val
+                        return '₱' + val.toLocaleString()
                     }
                 }
             },
             tooltip: {
                 x: {
                     formatter: function (val) {
-                        return val + ' /23'
+                        return val + ' ' + new Date().getFullYear()
                     }
                 }
             }
         }
-    JS);
+        JS);
     }
 }

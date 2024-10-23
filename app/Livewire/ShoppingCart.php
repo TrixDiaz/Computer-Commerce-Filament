@@ -98,12 +98,15 @@ class ShoppingCart extends Component
     public function getUpdatedCart()
     {
         $this->cartItems = collect(session('cart', []));
-        $this->cartItems->transform(function ($item, $productId) {
-            $product = \App\Models\Product::find($productId);
+        $this->cartItems = $this->cartItems->map(function ($item, $productId) {
+            $product = Product::find($productId);
             if ($product) {
                 $item['stock'] = $product->stock_quantity;
-                // Ensure the quantity doesn't exceed the stock
                 $item['quantity'] = min($item['quantity'], $item['stock']);
+                // Ensure all item properties are strings or numbers
+                $item['name'] = (string) $item['name'];
+                $item['price'] = (float) $item['price'];
+                $item['image'] = $product->images[0] ?? null; // Assuming the first image
             }
             return $item;
         });

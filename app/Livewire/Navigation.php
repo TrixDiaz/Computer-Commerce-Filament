@@ -27,7 +27,8 @@ class Navigation extends Component
 
     public function updateCartCount()
     {
-        $this->cartCount = count(session('cart', []));
+        $cart = session('cart', []);
+        $this->cartCount = collect($cart)->sum('quantity');
     }
 
     public function removeFromCart($productId)

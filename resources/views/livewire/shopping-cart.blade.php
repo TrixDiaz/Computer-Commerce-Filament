@@ -24,15 +24,11 @@
                                     <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                                         <a href="#" class="w-20 shrink-0 md:order-1">
                                             <img class="h-20 w-20 dark:hidden"
-                                                :src="item.image || '/images/laptop-image.png'"
-                                                :alt="item.name"
-                                                @mouseover="$event.target.src='/images/hover-image.png'"
-                                                @mouseout="$event.target.src=item.image || '/images/laptop-image.png'" />
+                                                :src="item.image"
+                                                :alt="item.name" />
                                             <img class="hidden h-20 w-20 dark:block"
-                                                :src="item.image || '/images/laptop-image.png'"
-                                                :alt="item.name"
-                                                @mouseover="$event.target.src='/images/hover-image.png'"
-                                                @mouseout="$event.target.src=item.image || '/images/laptop-image.png'" />
+                                                :src="item.image"
+                                                :alt="item.name" />
                                         </a>
 
                                         <label :for="'counter-input-' + productId" class="sr-only">Choose quantity:</label>
@@ -82,15 +78,11 @@
                                 <div class="space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                                     <a href="#" class="overflow-hidden rounded">
                                         <img class="mx-auto h-44 w-44 dark:hidden"
-                                            src="{{ $product['images'] ?? '/images/laptop-image.png' }}"
-                                            alt="{{ $product['name'] }}"
-                                            onmouseover="this.src='/images/hover-image.png'"
-                                            onmouseout="this.src='{{ $product['images'] ?? '/images/laptop-image.png' }}'" />
+                                            src="{{ $product['images'][0] ?? '' }}"
+                                            alt="{{ $product['name'] }}" />
                                         <img class="mx-auto h-44 w-44 hidden dark:block"
-                                            src="{{ $product['images'] ?? '/images/laptop-image.png' }}"
-                                            alt="{{ $product['name'] }}"
-                                            onmouseover="this.src='/images/hover-image.png'"
-                                            onmouseout="this.src='{{ $product['images'] ?? '/images/laptop-image.png' }}'" />
+                                            src="{{ $product['images'][0] ?? '' }}"
+                                            alt="{{ $product['name'] }}" />
                                     </a>
                                     <div>
                                         <a href="#" class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{{ $product['name'] }}</a>

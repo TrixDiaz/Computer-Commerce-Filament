@@ -97,8 +97,6 @@ class ProductResource extends Resource
                             ->label('3D Model')
                             ->disk('public')
                             ->directory('models')
-                            // ->acceptedFileTypes(['glb', 'gltf'])
-                            ->maxSize(50 * 1024), // 50MB max size
                     ]),
 
                     Forms\Components\Section::make()->schema([

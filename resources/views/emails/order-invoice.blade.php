@@ -43,24 +43,28 @@
         <h2>Order Totals</h2>
         <table>
             <tr>
-                <th>Subtotal</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+            <tr>
+                <td>Subtotal</td>
                 <td>₱{{ number_format($orderDetails['subtotal'], 2) }}</td>
             </tr>
             <tr>
-                <th>Tax</th>
+                <td>Tax</td>
                 <td>₱{{ number_format($orderDetails['tax'], 2) }}</td>
             </tr>
             <tr>
-                <th>Delivery Fee</th>
+                <td>Delivery Fee</td>
                 <td>₱{{ number_format($orderDetails['deliveryFee'], 2) }}</td>
             </tr>
             <tr>
-                <th>Discount</th>
+                <td>Discount</td>
                 <td>₱{{ number_format($orderDetails['discount'], 2) }}</td>
             </tr>
             <tr>
-                <th>Total</th>
-                <td>₱{{ number_format($orderDetails['total'], 2) }}</td>
+                <td><strong>Total</strong></td>
+                <td><strong>₱{{ number_format($orderDetails['total'], 2) }}</strong></td>
             </tr>
         </table>
 

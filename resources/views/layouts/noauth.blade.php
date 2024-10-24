@@ -80,8 +80,7 @@
         });
     </script>
 
-      <!-- Custom Chat Widget -->
-      <div x-data="chatWidget()" x-cloak>
+    <div x-data="chatWidget()" x-cloak>
         <!-- Toggle Button -->
         <button @click="toggleChat()"
             class="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -167,25 +166,34 @@
 
                     // Send message to BotMan
                     fetch('/botman', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ message: userMessage }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.addMessage('bot', data.message);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        this.addMessage('bot', "I'm sorry, there was an error processing your request.");
-                    });
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                message: userMessage
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.redirect) {
+                                // Redirect to Chatify
+                                window.location.href = '/chatify';
+                            } else {
+                                this.addMessage('bot', data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            this.addMessage('bot', "I'm sorry, there was an error processing your request.");
+                        });
                 }
             }))
         })
     </script>
+
+    @livewireScripts
 </body>
 
 </html>

@@ -92,7 +92,6 @@
         });
     </script>
 
-    <!-- Custom Chat Widget -->
     <div x-data="chatWidget()" x-cloak>
         <!-- Toggle Button -->
         <button @click="toggleChat()"
@@ -190,7 +189,12 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            this.addMessage('bot', data.message);
+                            if (data.redirect) {
+                                // Redirect to Chatify
+                                window.location.href = '/chatify';
+                            } else {
+                                this.addMessage('bot', data.message);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -202,6 +206,5 @@
     </script>
 
     @livewireScripts
-</body>
 
 </html>

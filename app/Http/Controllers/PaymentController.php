@@ -127,7 +127,10 @@ class PaymentController extends Controller
 
     private function calculateSubtotal($cartItems)
     {
-        return array_reduce($cartItems, function ($carry, $item) {
+        // Convert to array if it's a collection
+        $items = $cartItems instanceof \Illuminate\Support\Collection ? $cartItems->toArray() : $cartItems;
+
+        return array_reduce($items, function ($carry, $item) {
             return $carry + ($item['price'] * $item['quantity']);
         }, 0);
     }

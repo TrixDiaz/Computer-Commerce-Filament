@@ -97,6 +97,7 @@ class ProductResource extends Resource
                             ->label('3D Model')
                             ->disk('public')
                             ->directory('models')
+                            ->maxSize(50 * 1024), // 50 MB
                     ]),
 
                     Forms\Components\Section::make()->schema([

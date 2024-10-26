@@ -9,6 +9,9 @@ use App\Livewire\ProductProfile;
 
 Route::view('/', 'welcome')->name('home');
 
+Route::view('privacy', 'privacy')->name('privacy');
+Route::view('terms', 'terms')->name('terms');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

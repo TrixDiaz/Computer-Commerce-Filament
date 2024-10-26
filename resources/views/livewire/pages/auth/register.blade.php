@@ -78,12 +78,24 @@ new #[Layout('layouts.guest')] class extends Component
                     <input wire:model="terms" id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required>
                 </div>
                 <div class="ml-3 text-sm">
-                    <label for="terms" class="font-light text-gray-500 dark:text-gray-300">I accept the <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="#">Terms and Conditions</a></label>
+                    <label for="terms" class="font-light text-gray-500 dark:text-gray-300">I accept the <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('privacy') }}">Privacy Policy</a>
+                        and
+                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('terms') }}">Terms Conditions</a></label>
                 </div>
             </div>
             <x-input-error :messages="$errors->get('terms')" class="mt-2" />
-            <x-primary-button class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                {{ __('Create an account') }}
+            <x-primary-button 
+                type="submit"
+                id="submit-button"
+                class="w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center focus:outline-none transition-colors duration-200"
+                :class="$terms 
+                    ? 'bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-full' 
+                    : 'bg-gray-400 cursor-not-allowed w-full'"
+                :disabled="!$terms"
+                wire:loading.attr="disabled"
+            >
+                <span wire:loading.remove>{{ __('Create an account') }}</span>
+                <span wire:loading>Processing...</span>
             </x-primary-button>
             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account? <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Login here</a>
@@ -91,3 +103,21 @@ new #[Layout('layouts.guest')] class extends Component
         </form>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const termsCheckbox = document.getElementById('terms');
+        const submitButton = document.getElementById('submit-button');
+
+        termsCheckbox.addEventListener('change', function() {
+            submitButton.disabled = !this.checked;
+            if (this.checked) {
+                submitButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                submitButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            }
+        });
+    });
+</script>

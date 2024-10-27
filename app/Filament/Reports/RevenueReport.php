@@ -144,12 +144,13 @@ class RevenueReport extends Report
 
         foreach ($orders as $order) {
             $itemsList = $order->orderItems->map(function ($item) {
-                return "• {$item->product->name} - Qty: {$item->quantity} - Price: " . number_format($item->price, 2);
+                $productName = $item->product->name ?? 'Unknown Product';
+                return "• {$productName} - Qty: {$item->quantity} - Price: " . number_format($item->price, 2);
             })->join("\n");
 
             $result->push([
                 'column1' => $order->order_number,
-                'column2' => $order->customer?->name ?? 'N/A', // Use null coalescing operator
+                'column2' => $order->customer?->name ?? 'N/A',
                 'column3' => number_format($order->total_amount, 2),
                 'column4' => $order->status,
                 'column5' => $order->payment_status,

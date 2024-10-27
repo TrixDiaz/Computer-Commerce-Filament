@@ -149,7 +149,7 @@ class RevenueReport extends Report
 
             $result->push([
                 'column1' => $order->order_number,
-                'column2' => $order->customer->name,
+                'column2' => $order->customer?->name ?? 'N/A', // Use null coalescing operator
                 'column3' => number_format($order->total_amount, 2),
                 'column4' => $order->status,
                 'column5' => $order->payment_status,

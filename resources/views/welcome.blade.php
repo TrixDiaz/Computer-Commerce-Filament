@@ -81,9 +81,6 @@
     <!-- Promo -->
     <livewire:promo />
 
-    <!-- FAQ -->
-    <livewire:faq />
-
     <!-- Newsletter -->
     <livewire:newsletter />
 

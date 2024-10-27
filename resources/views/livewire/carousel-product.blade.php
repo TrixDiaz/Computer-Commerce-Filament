@@ -11,16 +11,27 @@
                     @foreach($chunk as $index => $product)
                     <div class="relative group {{ $index >= 2 ? 'hidden lg:block' : '' }} flex justify-center items-center">
                         <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="w-full h-full flex justify-center items-center">
-                            @php
-                            $images = json_decode($product->image_url, true) ?? [];
-                            $defaultImage = count($images) > 0 ? $images[0] : 'images/laptop-image.png';
-                            $hoverImage = count($images) > 1 ? $images[array_rand($images, 1)] : 'images/hover-image.png';
-                            @endphp
-                            <img src="{{ $defaultImage }}"
-                                class="max-w-full max-h-full object-contain transition-opacity duration-300 ease-in-out"
-                                alt="{{ $product->name }}"
-                                @mouseenter="$event.target.src = '{{ $hoverImage }}'"
-                                @mouseleave="$event.target.src = '{{ $defaultImage }}'">
+                            <div class="h-56 w-full relative group">
+                                @php
+                                $defaultImage = '/images/laptop-image.png';
+                                $defaultHoverImage = '/images/hover-image.png';
+                                $images = $product->images ?? [];
+                                $mainImage = !empty($images) ? $images[array_rand($images)] : $defaultImage;
+                                $hoverImage = !empty($images) ? $images[array_rand($images)] : $defaultHoverImage;
+                                // Ensure hover image is different from main image if possible
+                                while (!empty($images) && count($images) > 1 && $hoverImage === $mainImage) {
+                                    $hoverImage = $images[array_rand($images)];
+                                }
+                                @endphp
+                                <img
+                                    class="mx-auto h-full w-full object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0"
+                                    src="{{ !empty($images) ? Storage::url($mainImage) : asset($defaultImage) }}"
+                                    alt="{{ $product->name }}" />
+                                <img
+                                    class="mx-auto h-full w-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"
+                                    src="{{ !empty($images) ? Storage::url($hoverImage) : asset($defaultHoverImage) }}"
+                                    alt="{{ $product->name }} - Hover" />
+                            </div>
                             <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
                                 <p class="text-sm font-bold">{{ $product->name }}</p>
                                 <p class="text-xs">${{ number_format($product->price, 2) }}</p>

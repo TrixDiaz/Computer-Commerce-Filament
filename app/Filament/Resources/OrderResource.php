@@ -75,7 +75,13 @@ class OrderResource extends Resource
                                 ->label('Status')
                                 ->required()
                                 ->extraAttributes(['class' => 'text-xs capitalize',])
-                                ->options(Order::$statuses)
+                                ->options([
+                                    'pending' => 'Pending',
+                                    'processing' => 'Processing',
+                                    'completed' => 'Completed',
+                                    'cancelled' => 'Cancelled',
+                                    'refunded' => 'Refunded',
+                                    ])
                                 ->native(false),
                         ]),
 

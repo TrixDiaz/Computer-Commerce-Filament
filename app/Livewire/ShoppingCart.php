@@ -165,9 +165,11 @@ class ShoppingCart extends Component
             $product = \App\Models\Product::find($productId);
             if ($product) {
                 $maxQuantity = min($product->stock_quantity, max(1, $quantity));
-                $this->cartItems[$productId]['quantity'] = $maxQuantity;
-                $this->cartItems[$productId]['stock'] = $product->stock_quantity;
-                session(['cart' => $this->cartItems->toArray()]);
+                $updatedCartItems = $this->cartItems->toArray();
+                $updatedCartItems[$productId]['quantity'] = $maxQuantity;
+                $updatedCartItems[$productId]['stock'] = $product->stock_quantity;
+                $this->cartItems = collect($updatedCartItems);
+                session(['cart' => $updatedCartItems]);
                 $this->calculateTotal();
             }
         }
@@ -175,8 +177,10 @@ class ShoppingCart extends Component
 
     public function removeItem($productId)
     {
-        $this->cartItems->forget($productId);
-        session(['cart' => $this->cartItems->toArray()]);
+        $updatedCartItems = $this->cartItems->toArray();
+        unset($updatedCartItems[$productId]);
+        $this->cartItems = collect($updatedCartItems);
+        session(['cart' => $updatedCartItems]);
         $this->calculateTotal();
         $this->dispatch('swal:success', [
             'title' => 'Success!',

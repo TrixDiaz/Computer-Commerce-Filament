@@ -73,6 +73,7 @@ class ProductResource extends Resource
                         Forms\Components\FileUpload::make('images')
                             ->label('Images')
                             ->multiple()
+                            ->preserveFilenames()
                             ->columnSpanFull(),
                     ])->columns(2),
                 ])
@@ -97,6 +98,7 @@ class ProductResource extends Resource
                             ->label('3D Model')
                             ->disk('public')
                             ->directory('models')
+                            ->preserveFilenames()
                             ->maxSize(512000),
                     ]),
 

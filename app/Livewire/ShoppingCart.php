@@ -14,6 +14,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class ShoppingCart extends Component
 {
@@ -242,12 +244,28 @@ class ShoppingCart extends Component
             ]);
         });
 
+        // Send notification to the user
+        $user = auth()->user();
+        Notification::make()
+            ->title('Order Placed')
+            ->body("Your Cash on Delivery order has been placed successfully. Order #{$order->order_number}")
+            ->success()
+            ->sendToDatabase($user);
+
+        // Send notification to the admin (assuming user with ID 1 is the admin)
+        $admin = \App\Models\User::find(1);
+        Notification::make()
+            ->title('New Order')
+            ->body("A new Cash on Delivery order has been placed. Order #{$order->order_number}")
+            ->success()
+            ->sendToDatabase($admin);
+
         // Clear the cart session
         session()->forget('cart');
 
         $this->dispatch('swal:success', [
             'title' => 'Order Placed!',
-            'text' => 'Your Cash on Delivery order has been placed successfully.',
+            'text' => "Your Cash on Delivery order has been placed successfully. Order #{$order->order_number}",
             'icon' => 'success',
         ]);
 
@@ -262,6 +280,8 @@ class ShoppingCart extends Component
     private function handleGCashCheckout()
     {
         $total = $this->total;
+        $user = Auth::user();
+        $customerName = $user->first_name . ' ' . $user->last_name;
 
         $data = [
             'data' => [
@@ -279,6 +299,16 @@ class ShoppingCart extends Component
                     'success_url' => route('payment.success'),
                     'cancel_url' => route('payment.failed'),
                     'description' => 'Payment for your order',
+                    'customer' => [
+                        'name' => $customerName,
+                        'email' => $user->email,
+                        'phone' => $user->phone ?? '',
+                    ],
+                    'billing' => [
+                        'name' => $customerName,
+                        'email' => $user->email,
+                        'phone' => $user->phone ?? '',
+                    ],
                 ],
             ],
         ];
@@ -293,7 +323,7 @@ class ShoppingCart extends Component
             'total_amount' => $this->total,
             'status' => 'pending',
             'payment_method' => 'gcash',
-            'shipping_address_id' => $this->selectedAddressId, 
+            'shipping_address_id' => $this->selectedAddressId,
         ]);
 
         // Add order items

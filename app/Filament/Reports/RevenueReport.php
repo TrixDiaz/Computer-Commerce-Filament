@@ -49,6 +49,10 @@ class RevenueReport extends Report
                                 fn(?array $filters) => $this->ordersSummary($filters)
                             ),
                         VerticalSpace::make(),
+                        Body\Table::make()
+                            ->data(
+                                fn(?array $filters) => $this->salesSummary($filters)
+                            ),
                     ]),
             ]);
     }
@@ -80,20 +84,11 @@ class RevenueReport extends Report
     {
         return $form
             ->schema([
-                \Filament\Forms\Components\DatePicker::make('start_date')
-                    ->label('Start Date')
-                    ->placeholder('Start Date')
-                    ->timezone('Asia/Manila')
-                    ->displayFormat('Y-m-d')
-                    ->native(false)
-                    ->maxDate(now()),
-                \Filament\Forms\Components\DatePicker::make('end_date')
-                    ->label('End Date')
-                    ->placeholder('End Date')
-                    ->timezone('Asia/Manila')
-                    ->displayFormat('Y-m-d')
-                    ->native(false)
-                    ->maxDate(now()),
+                \Filament\Forms\Components\Select::make('month')
+                    ->label('Month')
+                    ->options(collect(range(1, 12))->mapWithKeys(fn($month) => [$month => now()->setMonth($month)->format('F')]))
+                    ->placeholder('All Months')
+                    ->native(false),
                 \Filament\Forms\Components\Select::make('status')
                     ->label('Order Status')
                     ->options(array_combine(Order::$statuses, Order::$statuses))
@@ -105,9 +100,8 @@ class RevenueReport extends Report
                         ->color('danger')
                         ->action(function (Form $form) {
                             $form->fill([
-                                'start_date' => null,
-                                'end_date' => null,
                                 'status' => null,
+                                'month' => null,
                             ]);
                         })
                 ]),
@@ -117,15 +111,14 @@ class RevenueReport extends Report
     public function ordersSummary(?array $filters): Collection
     {
         $query = Order::query()
-            ->when($filters['start_date'] ?? null, fn($query, $date) => $query->whereDate('created_at', '>=', $date))
-            ->when($filters['end_date'] ?? null, fn($query, $date) => $query->whereDate('created_at', '<=', $date))
             ->when($filters['status'] ?? null, fn($query, $status) => $query->where('status', $status))
+            ->when($filters['month'] ?? null, fn($query, $month) => $query->whereMonth('created_at', $month))
             ->with(['customer', 'orderItems.product']);
 
-        $filtersApplied = isset($filters['start_date']) || isset($filters['end_date']) || isset($filters['status']);
+        $filtersApplied = isset($filters['status']) || isset($filters['month']);
 
         if (!$filtersApplied) {
-            $orders = $query->latest('created_at')->take(10)->get();
+            return collect();
         } else {
             $orders = $query->latest('created_at')->get();
         }
@@ -162,19 +155,48 @@ class RevenueReport extends Report
         return $result;
     }
 
-    public function revenueByDay(?array $filters): Collection
+    public function salesSummary(?array $filters): Collection
     {
-        return Order::query()
-            ->when($filters['start_date'] ?? null, fn($query, $date) => $query->whereDate('created_at', '>=', $date))
-            ->when($filters['end_date'] ?? null, fn($query, $date) => $query->whereDate('created_at', '<=', $date))
-            ->when($filters['status'] ?? null, fn($query, $status) => $query->where('status', $status))
-            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total_revenue')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->map(fn ($item) => [
-                'x' => $item->date,
-                'y' => $item->total_revenue,
+        // Check if any filters are applied
+        $filtersApplied = isset($filters['status']) || isset($filters['month']);
+
+        if (!$filtersApplied) {
+            return collect();
+        }
+
+        // Base query
+        $baseQuery = Order::query();
+
+        // Apply filters if present
+        if (isset($filters['month'])) {
+            $baseQuery->whereMonth('created_at', $filters['month']);
+        }
+
+        $result = collect([
+            [
+                'column1' => 'Status',
+                'column2' => 'Total Revenue',
+            ]
+        ]);
+
+        // If status filter is applied, show only that status
+        if (isset($filters['status'])) {
+            $total = $baseQuery->where('status', $filters['status'])->sum('total_amount');
+            $result->push([
+                'column1' => ucfirst($filters['status']),
+                'column2' => number_format($total, 2),
             ]);
+        } else {
+            // If no status filter, show all statuses
+            foreach (Order::$statuses as $status) {
+                $total = (clone $baseQuery)->where('status', $status)->sum('total_amount');
+                $result->push([
+                    'column1' => ucfirst($status),
+                    'column2' => number_format($total, 2),
+                ]);
+            }
+        }
+
+        return $result;
     }
 }

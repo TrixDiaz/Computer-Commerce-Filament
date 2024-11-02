@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class RevenueReport extends Model
+{
+    public function salesSummary(?array $filters): Collection
+    {
+        // Base query with filters applied
+        $query = Order::query()
+            ->when($filters['month'] ?? null, fn($query, $month) => $query->whereMonth('created_at', $month))
+            ->when($filters['status'] ?? null, fn($query, $status) => $query->where('status', $status));
+
+        // Calculate revenue
+        $revenue = $query->sum('total_amount');
+
+        return collect([
+            [
+                'column1' => 'Filtered Revenue',
+                'column2' => number_format($revenue, 2),
+            ],
+        ]);
+    }
+} 

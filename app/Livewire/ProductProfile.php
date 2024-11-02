@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Ixudra\Curl\Facades\Curl;
 use Illuminate\Support\Facades\Session;
 
@@ -28,8 +29,8 @@ class ProductProfile extends Component
 
         $product = Product::findOrFail($productId);
         $cart = session()->get('cart', []);
-        
-        if(isset($cart[$productId])) {
+
+        if (isset($cart[$productId])) {
             $cart[$productId]['quantity']++;
         } else {
             $cart[$productId] = [
@@ -52,7 +53,7 @@ class ProductProfile extends Component
                 "is_on_sale" => $product->is_on_sale,
             ];
         }
-        
+
         session()->put('cart', $cart);
         $this->dispatch('cartUpdated');
         $this->dispatch('swal:success', [
@@ -96,6 +97,9 @@ class ProductProfile extends Component
         session()->put('selected_address_id', auth()->user()->addresses->first()->id ?? null);
         session()->put('payment_method', 'gcash');
         session()->put('shipping_option', 'standard');
+        $user = Auth::user();
+
+        $customerName = $user->first_name . ' ' . $user->last_name;
 
         $data = [
             'data' => [
@@ -113,10 +117,20 @@ class ProductProfile extends Component
                     'success_url' => route('payment.success'),
                     'cancel_url' => route('payment.failed'),
                     'description' => "Payment for {$product->name}",
+                    'customer' => [
+                        'name' => $customerName,
+                        'email' => $user->email,
+                        'phone' => $user->phone ?? '',
+                    ],
+                    'billing' => [
+                        'name' => $customerName,
+                        'email' => $user->email,
+                        'phone' => $user->phone ?? '',
+                    ],
                 ],
             ],
         ];
-        
+
         $response = Curl::to('https://api.paymongo.com/v1/checkout_sessions')
             ->withHeader('Content-Type: application/json')
             ->withHeader('accept: application/json')

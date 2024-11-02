@@ -201,27 +201,28 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('customer.name')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('customer', function (Builder $query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('billingAddress.address_line_1')
-                    ->label('Billing Address')
-                    ->sortable(),
+                    ->label('Billing Address'),
                 Tables\Columns\TextColumn::make('shippingAddress.address_line_1')
-                    ->label('Shipping Address')
-                    ->sortable(),
+                    ->label('Shipping Address'),
                 Tables\Columns\TextColumn::make('order_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

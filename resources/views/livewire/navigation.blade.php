@@ -6,7 +6,7 @@
                 <div class="flex items-center space-x-8">
                     <div class="shrink-0">
                         <a href="{{ route('home') }}" title="" class="text-xl font-bold">
-                           GamerGo
+                            GamerGo
                         </a>
                     </div>
 
@@ -31,22 +31,21 @@
                             type="text"
                             wire:model.live="search"
                             class="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:border-blue-500 focus:outline-none focus:ring"
-                            placeholder="Search products..."
-                        >
+                            placeholder="Search products...">
                         @if(!empty($searchResults))
-                            <div class="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-gray-800 max-h-96 overflow-y-auto">
-                                @forelse($searchResults as $product)
-                                    <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <img src="{{ $product->images_url[0] ?? asset('path/to/placeholder-image.jpg') }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-md mr-4">
-                                        <div>
-                                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ $product->name }}</h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">₱{{ number_format($product->price, 2) }}</p>
-                                        </div>
-                                    </a>
-                                @empty
-                                    <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No results found</div>
-                                @endforelse
-                            </div>
+                        <div class="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-gray-800 max-h-96 overflow-y-auto">
+                            @forelse($searchResults as $product)
+                            <a href="{{ route('product-profile', ['slug' => $product->slug]) }}" class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <img src="{{ $product->images_url[0] ?? asset('path/to/placeholder-image.jpg') }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-md mr-4">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ $product->name }}</h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">₱{{ number_format($product->price, 2) }}</p>
+                                </div>
+                            </a>
+                            @empty
+                            <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No results found</div>
+                            @endforelse
+                        </div>
                         @endif
                     </div>
                 </div>
@@ -57,12 +56,12 @@
                         open: false, 
                         toggle() { this.open = !this.open },
                         close() { this.open = false }
-                    }" 
+                    }"
                         @keydown.escape.prevent.stop="close()"
                         @click.away="close()"
                         class="relative inline-block">
-                        
-                        <button @click="toggle()" 
+
+                        <button @click="toggle()"
                             class="flex items-center space-x-2 text-gray-600 hover:text-gray-700 focus:outline-none"
                             x-ref="button">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -71,13 +70,13 @@
                             Notifications
                             <span class="sr-only">Notifications</span>
                             @if($unreadNotificationsCount > 0)
-                                <span class="relative top-2 right-0 -mt-4 -mr-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
-                                    {{ $unreadNotificationsCount }}
-                                </span>
+                            <span class="relative top-2 right-0 -mt-4 -mr-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                                {{ $unreadNotificationsCount }}
+                            </span>
                             @endif
                         </button>
 
-                        <div x-show="open" 
+                        <div x-show="open"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="transform opacity-0 scale-95"
                             x-transition:enter-end="transform opacity-100 scale-100"
@@ -89,25 +88,26 @@
                             x-cloak
                             @click.away="close()"
                             :style="{ top: $refs.button.offsetHeight + 'px', right: '0px' }">
-                            
+
                             <div class="py-2">
                                 <div class="px-4 py-2 bg-gray-100 border-b flex justify-between items-center">
                                     <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
                                     <div>
                                         @if($unreadNotificationsCount > 0)
-                                            <button wire:click="markAllAsRead" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
-                                                Mark all as read
-                                            </button>
+                                        <button wire:click="markAllAsRead" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
+                                            Mark all as read
+                                        </button>
                                         @endif
                                         @if(count($notifications) > 0)
-                                            <button wire:click="clearAllNotifications" class="text-xs text-red-600 hover:text-red-800">
-                                                Clear all
-                                            </button>
+                                        <button wire:click="clearAllNotifications" class="text-xs text-red-600 hover:text-red-800">
+                                            Clear all
+                                        </button>
                                         @endif
                                     </div>
                                 </div>
-                                
-                                @forelse($notifications as $notification)
+
+                                <div class="max-h-80 overflow-y-auto">
+                                    @forelse($notifications as $notification)
                                     <div class="px-4 py-3 hover:bg-gray-50 {{ $notification->read_at ? 'opacity-50' : '' }}">
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
@@ -115,14 +115,14 @@
                                                     {{ $notification->data['title'] ?? 'Order Placed Successfully' }}
                                                 </p>
                                                 @php
-                                                    $body = $notification->data['body'] ?? '';
-                                                    preg_match('/Order #([\w-]+)/', $body, $matches);
-                                                    $orderNumber = $matches[1] ?? '';
+                                                $body = $notification->data['body'] ?? '';
+                                                preg_match('/Order #([\w-]+)/', $body, $matches);
+                                                $orderNumber = $matches[1] ?? '';
                                                 @endphp
                                                 @if($orderNumber)
-                                                    <p class="mt-1 text-sm text-gray-600">
-                                                        Order #{{ $orderNumber }}
-                                                    </p>
+                                                <p class="mt-1 text-sm text-gray-600">
+                                                    <a href="{{ route('orders') }}" class="text-blue-600 hover:text-blue-800"> Order #{{ $orderNumber }}</a>
+                                                </p>
                                                 @endif
                                                 <p class="mt-1 text-xs text-gray-400">
                                                     {{ $notification->created_at->diffForHumans() }}
@@ -130,9 +130,9 @@
                                             </div>
                                             <div>
                                                 @if(!$notification->read_at)
-                                                    <button wire:click="markAsRead('{{ $notification->id }}')" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
-                                                        Mark as read
-                                                    </button>
+                                                <button wire:click="markAsRead('{{ $notification->id }}')" class="text-xs text-blue-600 hover:text-blue-800 mr-2">
+                                                    Mark as read
+                                                </button>
                                                 @endif
                                                 <button wire:click="clearNotification('{{ $notification->id }}')" class="text-xs text-red-600 hover:text-red-800">
                                                     Clear
@@ -140,11 +140,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                @empty
+                                    @empty
                                     <div class="px-4 py-3 text-sm text-gray-500">
                                         No notifications
                                     </div>
-                                @endforelse
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -165,29 +166,29 @@
 
                     <div id="myCartDropdown1" class="hidden z-10 mx-auto max-w-sm space-y-4 overflow-hidden rounded-lg bg-white p-4 antialiased shadow-lg dark:bg-gray-800">
                         @if(session()->has('cart') && is_array(session('cart')))
-                            @foreach(session('cart') as $id => $details)
-                                @if(is_array($details) && isset($details['name'], $details['price'], $details['quantity'], $details['slug']))
-                                    <div class="grid grid-cols-2">
-                                        <div>
-                                            <a href="{{ route('product-profile', ['slug' => $details['slug']]) }}" class="truncate text-sm font-semibold leading-none text-gray-900 dark:text-white hover:underline">{{ $details['name'] }}</a>
-                                            <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">₱{{ number_format($details['price'], 2) }}</p>
-                                        </div>
+                        @foreach(session('cart') as $id => $details)
+                        @if(is_array($details) && isset($details['name'], $details['price'], $details['quantity'], $details['slug']))
+                        <div class="grid grid-cols-2">
+                            <div>
+                                <a href="{{ route('product-profile', ['slug' => $details['slug']]) }}" class="truncate text-sm font-semibold leading-none text-gray-900 dark:text-white hover:underline">{{ $details['name'] }}</a>
+                                <p class="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">₱{{ number_format($details['price'], 2) }}</p>
+                            </div>
 
-                                        <div class="flex items-center justify-end gap-6">
-                                            <p class="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Qty: {{ $details['quantity'] }}</p>
+                            <div class="flex items-center justify-end gap-6">
+                                <p class="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Qty: {{ $details['quantity'] }}</p>
 
-                                            <button wire:click="removeFromCart({{ $id }})" class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600">
-                                                <span class="sr-only">Remove</span>
-                                                <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path fill-rule="evenodd" d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L12 10.6 9.7 8.3Z" clip-rule="evenodd" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
+                                <button wire:click="removeFromCart({{ $id }})" class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600">
+                                    <span class="sr-only">Remove</span>
+                                    <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L12 10.6 9.7 8.3Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        @endif
+                        @endforeach
                         @else
-                            <p class="text-center text-gray-500 dark:text-gray-400">Your cart is empty</p>
+                        <p class="text-center text-gray-500 dark:text-gray-400">Your cart is empty</p>
                         @endif
 
                         <a href="{{ route('cart') }}" title="" class="mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" role="button">Proceed to Cart</a>

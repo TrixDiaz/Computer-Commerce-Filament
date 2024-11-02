@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\BotManController;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\ShoppingCart;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Livewire\ProductProfile;

@@ -102,7 +102,7 @@ new #[Layout('layouts.guest')] class extends Component
                 <div class="flex items-center h-5">
                     <input wire:model="terms" id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required>
                 </div>
-                <div class="ml-3 text-sm">
+                <div class="ml-3 text-sm mb-2">
                     <label for="terms" class="font-light text-gray-500 dark:text-gray-300">I accept the <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('privacy') }}">Privacy Policy</a>
                         and
                         <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="{{ route('terms') }}">Terms Conditions</a></label>
@@ -121,7 +121,7 @@ new #[Layout('layouts.guest')] class extends Component
                 <span wire:loading.remove>{{ __('Create an account') }}</span>
                 <span wire:loading>Processing...</span>
             </x-primary-button>
-            <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+            <p class="text-sm font-light text-gray-500 dark:text-gray-400 mt-1">
                 Already have an account? <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Login here</a>
             </p>
         </form>

@@ -6,7 +6,12 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Livewire\ProductProfile;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', function () {
+    if (auth()->check() && auth()->user()->email_verified_at === null) {
+        return redirect()->route('verification.notice');
+    }
+    return view('welcome');
+})->name('home');
 
 Route::view('privacy', 'privacy')->name('privacy');
 Route::view('terms', 'terms')->name('terms');
@@ -49,5 +54,7 @@ Route::match(['get', 'post'], '/botman', BotManController::class . '@handle')->n
 Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
 
 Route::get('/products/{slug}', ProductProfile::class)->name('product.show');
+
+
 
 require __DIR__ . '/auth.php';

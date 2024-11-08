@@ -76,12 +76,12 @@ class OrderResource extends Resource
                                 ->required()
                                 ->extraAttributes(['class' => 'text-xs capitalize',])
                                 ->options([
+                                    'cancelled' => 'Cancelled',
                                     'pending' => 'Pending',
                                     'processing' => 'Processing',
-                                    'completed' => 'Completed',
-                                    'cancelled' => 'Cancelled',
-                                    'refunded' => 'Refunded',
                                     'out for delivery' => 'Out for Delivery',
+                                    'refunded' => 'Refunded',
+                                    'completed' => 'Completed',
                                     ])
                                 ->native(false),
                         ]),

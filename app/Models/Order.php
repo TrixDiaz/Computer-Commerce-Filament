@@ -27,12 +27,14 @@ class Order extends Model
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_REFUNDED = 'refunded';
+    const STATUS_OUT_FOR_DELIVERY = 'out for delivery';
     public static $statuses = [
         self::STATUS_PENDING,
         self::STATUS_PROCESSING,
         self::STATUS_COMPLETED,
         self::STATUS_CANCELLED,
         self::STATUS_REFUNDED,
+        self::STATUS_OUT_FOR_DELIVERY,
     ];
 
     protected $appends = ['name'];

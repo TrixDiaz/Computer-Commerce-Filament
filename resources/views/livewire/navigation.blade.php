@@ -106,13 +106,13 @@
                                     </div>
                                 </div>
 
-                                <div class="max-h-80 overflow-y-auto">
+                                <div class="max-h-96 overflow-y-auto">
                                     @forelse($notifications as $notification)
                                     <div class="px-4 py-3 hover:bg-gray-50 {{ $notification->read_at ? 'opacity-50' : '' }}">
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
                                                 <p class="text-sm font-medium text-gray-900">
-                                                    {{ $notification->data['title'] ?? 'Order Placed Successfully' }}
+                                                    <a href="{{ route('orders') }}" class="hover:text-blue-800 hover:cursor-pointer">{{ $notification->data['title'] ?? 'Order Placed Successfully' }}</a>
                                                 </p>
                                                 @php
                                                 $body = $notification->data['body'] ?? '';

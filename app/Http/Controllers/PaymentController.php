@@ -36,22 +36,32 @@ class PaymentController extends Controller
             'icon' => 'success',
         ]);
 
+        // Create Filament notification
+        Notification::make()
+            ->success()
+            ->title('Order Placed Successfully')
+            ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('view')
+                    ->label('View Order')
+                    ->url(route('orders'))
+            ])
+            ->sendToDatabase(Auth::user());
+
+        Notification::make()
+            ->success()
+            ->title('Payment Successful')
+            ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('view')
+                    ->label('View Order')
+                    ->url(route('filament.admin.resources.orders.edit', $order->id))
+            ])
+            ->sendToDatabase(User::find(1));
+
         // Clear the cart or session data
         session()->forget(['cart', 'selected_address_id', 'discount', 'payment_method', 'shipping_option']);
 
-        // Create Filament notification
-            Notification::make()
-                ->success()
-                ->title('Order Placed Successfully')
-                ->body("Your order #{$order->order_number} has been placed successfully.")
-                ->sendToDatabase(Auth::user());
-            
-                Notification::make()
-                ->success()
-                ->title('Order Placed Successfully')
-                ->body("Order #{$order->order_number} has been placed successfully.")
-                ->sendToDatabase(User::find(1));
-        
 
         return redirect()->route('home')->with('success', 'Payment successful!');
     }
@@ -155,6 +165,4 @@ class PaymentController extends Controller
 
         return $subtotal + $tax + $deliveryFee - $discount;
     }
-
-   
 }

@@ -322,7 +322,7 @@ class ShoppingCart extends Component
             'order_number' => $orderNumber,
             'total_amount' => $this->total,
             'status' => 'pending',
-            'payment_method' => 'gcash',
+            'payment_method' => ['gcash'],
             'shipping_address_id' => $this->selectedAddressId,
         ]);
 

@@ -81,6 +81,7 @@ class OrderResource extends Resource
                                     'completed' => 'Completed',
                                     'cancelled' => 'Cancelled',
                                     'refunded' => 'Refunded',
+                                    'out for delivery' => 'Out for Delivery',
                                     ])
                                 ->native(false),
                         ]),

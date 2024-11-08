@@ -79,7 +79,7 @@
     <livewire:carousel-product />
 
     <!-- Promo -->
-    <livewire:promo />
+    <!-- <livewire:promo /> -->
 
     <!-- Newsletter -->
     <livewire:newsletter />

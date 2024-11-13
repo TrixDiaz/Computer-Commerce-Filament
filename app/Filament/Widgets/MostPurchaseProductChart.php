@@ -34,6 +34,11 @@ class MostPurchaseProductChart extends ApexChartWidget
     protected static ?int $contentHeight = 260;
 
     /**
+     * Year
+     */
+    protected static int $year = 2024;
+
+    /**
      * Chart options (series, labels, types, size, animations...)
      * https://apexcharts.com/docs/options
      *
@@ -49,7 +54,7 @@ class MostPurchaseProductChart extends ApexChartWidget
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereYear('orders.created_at', now()->year)
+            ->whereYear('orders.created_at', self::$year)
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->groupBy('products.id', 'products.name')
             ->orderBy('order_frequency', 'desc')
@@ -59,7 +64,7 @@ class MostPurchaseProductChart extends ApexChartWidget
 
         // Get all months that have sales in the current year
         $activeMonths = Order::selectRaw('DISTINCT MONTH(created_at) as month')
-            ->whereYear('created_at', now()->year)
+            ->whereYear('created_at', self::$year)
             ->where('status', Order::STATUS_COMPLETED)
             ->orderBy('month')
             ->pluck('month')
@@ -72,7 +77,7 @@ class MostPurchaseProductChart extends ApexChartWidget
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereYear('orders.created_at', now()->year)
+            ->whereYear('orders.created_at', self::$year)
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereIn('products.name', $topProducts)
             ->groupBy('products.id', 'products.name', 'month')

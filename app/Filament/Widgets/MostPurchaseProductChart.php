@@ -108,7 +108,7 @@ class MostPurchaseProductChart extends ApexChartWidget
 
         return [
             'chart' => [
-                'type' => 'line',
+                'type' => 'area',
                 'height' => 300,
                 'animations' => [
                     'enabled' => false,
@@ -141,7 +141,7 @@ class MostPurchaseProductChart extends ApexChartWidget
                 'curve' => 'smooth',
             ],
             'tooltip' => [
-                'enabled' => false,
+                'enabled' => true,
             ],
             'states' => [
                 'hover' => [

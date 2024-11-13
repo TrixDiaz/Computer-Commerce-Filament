@@ -71,6 +71,10 @@ class OrderResource extends Resource
 
                     Forms\Components\Section::make('Order Information')
                         ->schema([
+                            Forms\Components\TextInput::make('payment_method')
+                                ->label('Payment Method')
+                                ->disabled()
+                                ->extraAttributes(['class' => 'capitalize',]),
                             Forms\Components\Select::make('status')
                                 ->label('Status')
                                 ->required()

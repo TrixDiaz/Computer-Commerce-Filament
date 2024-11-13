@@ -21,10 +21,10 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)
+        $totalRevenue = Order::where('status', 'completed')
             ->sum('total_amount');
 
-        $newOrdersCount = Order::where('status', Order::STATUS_PENDING)
+        $newOrdersCount = Order::where('status', 'pending')
             ->count();
 
         $newCustomersCount = Order::select('user_id')

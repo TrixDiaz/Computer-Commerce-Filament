@@ -6,19 +6,11 @@ use EightyNine\Reports\Report;
 use EightyNine\Reports\Components\Body;
 use EightyNine\Reports\Components\Footer;
 use EightyNine\Reports\Components\Header;
-use EightyNine\Reports\Components\Text;
-use EightyNine\Reports\Components\VerticalSpace;
-use EightyNine\Reports\Components\Table;
-use EightyNine\Reports\Components\Chart;
 use Filament\Forms\Form;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Illuminate\Support\Collection;
-use App\Models\Order;
 
-class RevenueReport extends Report
+class OrdersReport extends Report
 {
-    public ?string $heading = "Revenue Report";
+    public ?string $heading = "Orders Report";
 
     public function header(Header $header): Header
     {

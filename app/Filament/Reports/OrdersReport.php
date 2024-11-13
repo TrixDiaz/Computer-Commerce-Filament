@@ -24,9 +24,9 @@ class OrdersReport extends Report
                     ->schema([
                         Header\Layout\HeaderColumn::make()
                             ->schema([
-                                Text::make('Revenue Report')
+                                Text::make('Orders Report')
                                     ->title(),
-                                Text::make('This report shows revenue and order details in the system')
+                                Text::make('This report shows orders and revenue details in the system')
                                     ->subtitle(),
                             ]),
                         Header\Layout\HeaderColumn::make()

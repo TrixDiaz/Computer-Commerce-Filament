@@ -51,7 +51,7 @@ class PaymentController extends Controller
         Notification::make()
             ->success()
             ->title('Gcash Payment Successful')
-            ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
+            ->body("{$order->customer->first_name} {$order->customer->last_name}, order #{$order->order_number} has been placed successfully.")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label('View Order')

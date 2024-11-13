@@ -39,7 +39,7 @@ class PaymentController extends Controller
         // Create Filament notification
         Notification::make()
             ->success()
-            ->title('Order Placed Successfully')
+            ->title('Cash on Delivery Order Placed Successfully')
             ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
@@ -50,7 +50,7 @@ class PaymentController extends Controller
 
         Notification::make()
             ->success()
-            ->title('Payment Successful')
+            ->title('Gcash Payment Successful')
             ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')

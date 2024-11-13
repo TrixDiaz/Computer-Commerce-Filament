@@ -249,15 +249,15 @@ class ShoppingCart extends Component
         $admin = \App\Models\User::find(1);
 
         Notification::make()
-            ->title("{$order->payment_method} Order Placed")
-            ->body("Your {$order->payment_method} order has been placed successfully. Order #{$order->order_number}")
+            ->title("Cash on Delivery Order Placed")
+            ->body("Your Cash on Delivery order has been placed successfully. Order #{$order->order_number}")
             ->success()
             ->sendToDatabase($user);
 
         // Send notification to the admin (assuming user with ID 1 is the admin)
         Notification::make()
-            ->title("{$order->payment_method} Order Placed")
-            ->body("A new {$order->payment_method} order has been placed. Order #{$order->order_number}")
+            ->title("Cash on Delivery Order Placed")
+            ->body("A new Cash on Delivery order has been placed. Order #{$order->order_number}")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label('View Order')

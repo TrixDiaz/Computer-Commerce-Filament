@@ -6,7 +6,11 @@ use EightyNine\Reports\Report;
 use EightyNine\Reports\Components\Body;
 use EightyNine\Reports\Components\Footer;
 use EightyNine\Reports\Components\Header;
+use EightyNine\Reports\Components\Text;
+use EightyNine\Reports\Components\VerticalSpace;
 use Filament\Forms\Form;
+use App\Models\Order;
+use Illuminate\Support\Collection; 
 
 class OrdersReport extends Report
 {

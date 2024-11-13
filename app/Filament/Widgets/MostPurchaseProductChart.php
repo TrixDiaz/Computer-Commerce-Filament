@@ -57,6 +57,14 @@ class MostPurchaseProductChart extends ApexChartWidget
             ->pluck('name')
             ->toArray();
 
+        // Get all months that have sales in the current year
+        $activeMonths = Order::selectRaw('DISTINCT MONTH(created_at) as month')
+            ->whereYear('created_at', now()->year)
+            ->where('status', Order::STATUS_COMPLETED)
+            ->orderBy('month')
+            ->pluck('month')
+            ->toArray();
+
         $mostFrequentProducts = OrderItem::selectRaw('
                 products.name,
                 MONTH(orders.created_at) as month,
@@ -74,11 +82,11 @@ class MostPurchaseProductChart extends ApexChartWidget
         $productData = [];
         $productColors = [];
         $colorMap = [
-            0 => '#f59e0b', // Orange
-            1 => '#3b82f6', // Blue
-            2 => '#10b981', // Green
-            3 => '#ef4444', // Red
-            4 => '#8b5cf6', // Purple
+            0 => '#f59e0b',
+            1 => '#3b82f6',
+            2 => '#10b981',
+            3 => '#ef4444',
+            4 => '#8b5cf6',
         ];
 
         // Assign colors based on the fixed top products order
@@ -92,12 +100,18 @@ class MostPurchaseProductChart extends ApexChartWidget
 
         $series = [];
         $colors = [];
+
+        // Get month names for only active months
+        $monthNames = array_map(function($month) {
+            return date('M', mktime(0, 0, 0, $month, 1));
+        }, $activeMonths);
+
         // Maintain order based on $topProducts array
         foreach ($topProducts as $productName) {
             $monthlyData = $productData[$productName] ?? [];
             $data = array_map(function($month) use ($monthlyData) {
                 return $monthlyData[$month] ?? 0;
-            }, range(1, 12));
+            }, $activeMonths);
 
             $series[] = [
                 'name' => $productName,
@@ -122,7 +136,7 @@ class MostPurchaseProductChart extends ApexChartWidget
             ],
             'series' => $series,
             'xaxis' => [
-                'categories' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'categories' => $monthNames,
                 'labels' => [
                     'style' => [
                         'fontFamily' => 'inherit',

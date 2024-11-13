@@ -113,6 +113,12 @@ class MostPurchaseProductChart extends ApexChartWidget
                 'animations' => [
                     'enabled' => false,
                 ],
+                'toolbar' => [
+                    'show' => false,
+                ],
+                'zoom' => [
+                    'enabled' => false,
+                ],
             ],
             'series' => $series,
             'xaxis' => [
@@ -133,6 +139,16 @@ class MostPurchaseProductChart extends ApexChartWidget
             'colors' => $colors,
             'stroke' => [
                 'curve' => 'smooth',
+            ],
+            'tooltip' => [
+                'enabled' => false,
+            ],
+            'states' => [
+                'hover' => [
+                    'filter' => [
+                        'type' => 'none',
+                    ],
+                ],
             ],
         ];
     }

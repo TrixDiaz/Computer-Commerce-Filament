@@ -75,6 +75,9 @@ class MostPurchaseProductChart extends ApexChartWidget
             'chart' => [
                 'type' => 'line',
                 'height' => 300,
+                'animations' => [
+                    'enabled' => false,
+                ],
             ],
             'series' => $series,
             'xaxis' => [

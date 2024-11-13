@@ -3,10 +3,11 @@
 
     @if($orders->isEmpty())
     <p class="text-gray-600">You don't have any orders yet.</p>
-    @else
+    @else@
     <table class="min-w-full bg-white border border-gray-300">
         <thead>
             <tr>
+            
                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Order Number
                 </th>
@@ -30,6 +31,7 @@
         <tbody>
             @foreach($orders as $order)
             <tr>
+               
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
                     {{ $order->order_number }}
                 </td>

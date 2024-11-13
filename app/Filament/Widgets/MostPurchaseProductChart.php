@@ -41,26 +41,26 @@ class MostPurchaseProductChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
-        // Get the top 5 products based on total quantity across all months
+        // Get the top 5 products based on frequency of orders
         $topProducts = OrderItem::selectRaw('
                 products.id,
                 products.name,
-                SUM(order_items.quantity) as total_quantity
+                COUNT(*) as order_frequency
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereYear('orders.created_at', now()->year)
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->groupBy('products.id', 'products.name')
-            ->orderBy('total_quantity', 'desc')
+            ->orderBy('order_frequency', 'desc')
             ->limit(5)
             ->pluck('name')
             ->toArray();
 
-        $mostPurchasedProducts = OrderItem::selectRaw('
+        $mostFrequentProducts = OrderItem::selectRaw('
                 products.name,
                 MONTH(orders.created_at) as month,
-                SUM(order_items.quantity) as total_quantity
+                COUNT(*) as order_frequency
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -86,8 +86,8 @@ class MostPurchaseProductChart extends ApexChartWidget
             $productColors[$productName] = $colorMap[$index];
         }
 
-        foreach ($mostPurchasedProducts as $item) {
-            $productData[$item->name][$item->month] = $item->total_quantity;
+        foreach ($mostFrequentProducts as $item) {
+            $productData[$item->name][$item->month] = $item->order_frequency;
         }
 
         $series = [];

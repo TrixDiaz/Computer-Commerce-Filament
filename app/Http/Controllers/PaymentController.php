@@ -39,8 +39,8 @@ class PaymentController extends Controller
         // Create Filament notification
         Notification::make()
             ->success()
-            ->title("{$order->payment_method} Order Placed Successfully")
-            ->body("{$order->customer->first_name} {$order->customer->last_name}, Your order #{$order->order_number} has been placed successfully.")
+            ->title("Gcash Order Placed Successfully")
+            ->body("{$order->customer->first_name} {$order->customer->last_name},  order #{$order->order_number} has been placed successfully.")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label('View Order')

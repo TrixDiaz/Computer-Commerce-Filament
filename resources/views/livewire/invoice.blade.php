@@ -17,8 +17,12 @@
     <div class="mb-8">
         <h3 class="text-lg font-semibold mb-2">Bill To:</h3>
         <p>{{ $order->customer->name }}</p>
-        <p>{{ $order->billingAddress->address_line1 }}</p>
-        <p>{{ $order->billingAddress->city }}, {{ $order->billingAddress->state }} {{ $order->billingAddress->postal_code }}</p>
+        @if($order->billingAddress)
+            <p>{{ $order->billingAddress->address_line_1 }}</p>
+            <p>{{ $order->billingAddress->city }}, {{ $order->billingAddress->state }} {{ $order->billingAddress->postal_code }}</p>
+        @else
+            <p>No billing address provided</p>
+        @endif
     </div>
 
     <table class="w-full mb-8">

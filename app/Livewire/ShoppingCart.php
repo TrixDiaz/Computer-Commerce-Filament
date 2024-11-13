@@ -245,7 +245,9 @@ class ShoppingCart extends Component
         });
 
         // Send notification to the user
-        $user = auth()->user();
+        $user = Auth::user();
+        $admin = \App\Models\User::find(1);
+
         Notification::make()
             ->title('Order Placed')
             ->body("Your Cash on Delivery order has been placed successfully. Order #{$order->order_number}")
@@ -253,7 +255,6 @@ class ShoppingCart extends Component
             ->sendToDatabase($user);
 
         // Send notification to the admin (assuming user with ID 1 is the admin)
-        $admin = \App\Models\User::find(1);
         Notification::make()
             ->title('New Order')
             ->body("A new Cash on Delivery order has been placed. Order #{$order->order_number}")

@@ -54,20 +54,20 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach($order->items as $item)
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {{ $item->product->name }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $item->quantity }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    ${{ number_format($item->price, 2) }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    ${{ number_format($item->quantity * $item->price, 2) }}
-                                                </td>
-                                            </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {{ $item->product->name }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $item->quantity }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                ₱{{ number_format($item->price, 2) }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                ₱{{ number_format($item->quantity * $item->price, 2) }}
+                                            </td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -80,11 +80,11 @@
                 <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Subtotal</dt>
-                        <dd class="mt-1 text-sm text-gray-900">${{ number_format($order->total_amount - $order->discount, 2) }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">₱{{ number_format($order->total_amount - $order->discount, 2) }}</dd>
                     </div>
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Discount</dt>
-                        <dd class="mt-1 text-sm text-gray-900">${{ number_format($order->discount, 2) }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">₱{{ number_format($order->discount, 2) }}</dd>
                     </div>
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Shipping</dt>
@@ -92,7 +92,7 @@
                     </div>
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Total</dt>
-                        <dd class="mt-1 text-lg font-bold text-gray-900">${{ number_format($order->total_amount, 2) }}</dd>
+                        <dd class="mt-1 text-lg font-bold text-gray-900">₱{{ number_format($order->total_amount, 2) }}</dd>
                     </div>
                 </dl>
             </div>

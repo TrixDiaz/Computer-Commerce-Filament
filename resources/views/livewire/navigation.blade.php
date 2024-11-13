@@ -124,6 +124,7 @@
                                                     <a href="{{ route('orders') }}" class="text-blue-600 hover:text-blue-800"> Order #{{ $orderNumber }}</a>
                                                 </p>
                                                 @endif
+                                                <p class="text-sm text-gray-600 mt-1">{{ $notification->data['body'] ?? '' }}</p>
                                                 <p class="mt-1 text-xs text-gray-400">
                                                     {{ $notification->created_at->diffForHumans() }}
                                                 </p>

@@ -92,7 +92,9 @@ class MostPurchaseProductChart extends ApexChartWidget
 
         $series = [];
         $colors = [];
-        foreach ($productData as $productName => $monthlyData) {
+        // Maintain order based on $topProducts array
+        foreach ($topProducts as $productName) {
+            $monthlyData = $productData[$productName] ?? [];
             $data = array_map(function($month) use ($monthlyData) {
                 return $monthlyData[$month] ?? 0;
             }, range(1, 12));

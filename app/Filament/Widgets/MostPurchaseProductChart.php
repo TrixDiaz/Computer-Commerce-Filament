@@ -41,7 +41,7 @@ class MostPurchaseProductChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
-        // Get the top 5 products based on TOTAL quantity for the year
+        // Get the top 5 products based on total quantity across all months
         $topProducts = OrderItem::selectRaw('
                 products.id,
                 products.name,
@@ -49,54 +49,61 @@ class MostPurchaseProductChart extends ApexChartWidget
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereYear('order_items.created_at', now()->year)
+            ->whereYear('orders.created_at', now()->year)
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->groupBy('products.id', 'products.name')
-            ->orderByDesc('total_quantity')
+            ->orderBy('total_quantity', 'desc')
             ->limit(5)
-            ->get();
+            ->pluck('name')
+            ->toArray();
 
         $mostPurchasedProducts = OrderItem::selectRaw('
-                products.id,
                 products.name,
-                MONTH(order_items.created_at) as month,
+                MONTH(orders.created_at) as month,
                 SUM(order_items.quantity) as total_quantity
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereYear('order_items.created_at', now()->year)
+            ->whereYear('orders.created_at', now()->year)
             ->where('orders.status', Order::STATUS_COMPLETED)
-            ->whereIn('products.id', $topProducts->pluck('id'))
+            ->whereIn('products.name', $topProducts)
             ->groupBy('products.id', 'products.name', 'month')
-            ->orderBy('total_quantity', 'desc')
+            ->orderBy('month')
             ->get();
 
-        // Prepare series data maintaining the original order from topProducts
-        $series = [];
-        $colors = [];
+        $productData = [];
+        $productColors = [];
         $colorMap = [
-            0 => '#f59e0b',
-            1 => '#3b82f6',
-            2 => '#10b981',
-            3 => '#ef4444',
-            4 => '#8b5cf6',
+            0 => '#f59e0b', // Orange
+            1 => '#3b82f6', // Blue
+            2 => '#10b981', // Green
+            3 => '#ef4444', // Red
+            4 => '#8b5cf6', // Purple
         ];
 
-        foreach ($topProducts as $index => $product) {
-            $monthlyData = array_fill(1, 12, 0); // Initialize all months with 0
-            
-            // Fill in actual data
-            foreach ($mostPurchasedProducts as $item) {
-                if ($item->id === $product->id) {
-                    $monthlyData[$item->month] = $item->total_quantity;
-                }
-            }
+        // Assign colors based on the fixed top products order
+        foreach ($topProducts as $index => $productName) {
+            $productColors[$productName] = $colorMap[$index];
+        }
+
+        foreach ($mostPurchasedProducts as $item) {
+            $productData[$item->name][$item->month] = $item->total_quantity;
+        }
+
+        $series = [];
+        $colors = [];
+        // Maintain order based on $topProducts array
+        foreach ($topProducts as $productName) {
+            $monthlyData = $productData[$productName] ?? [];
+            $data = array_map(function($month) use ($monthlyData) {
+                return $monthlyData[$month] ?? 0;
+            }, range(1, 12));
 
             $series[] = [
-                'name' => $product->name,
-                'data' => array_values($monthlyData),
+                'name' => $productName,
+                'data' => $data,
             ];
-            $colors[] = $colorMap[$index];
+            $colors[] = $productColors[$productName];
         }
 
         return [
@@ -112,9 +119,6 @@ class MostPurchaseProductChart extends ApexChartWidget
                 'zoom' => [
                     'enabled' => false,
                 ],
-                'selection' => [
-                    'enabled' => false,
-                ],
             ],
             'series' => $series,
             'xaxis' => [
@@ -123,9 +127,6 @@ class MostPurchaseProductChart extends ApexChartWidget
                     'style' => [
                         'fontFamily' => 'inherit',
                     ],
-                ],
-                'tooltip' => [
-                    'enabled' => false,
                 ],
             ],
             'yaxis' => [
@@ -138,18 +139,12 @@ class MostPurchaseProductChart extends ApexChartWidget
             'colors' => $colors,
             'stroke' => [
                 'curve' => 'smooth',
-                'width' => 2,
             ],
             'tooltip' => [
                 'enabled' => false,
             ],
             'states' => [
                 'hover' => [
-                    'filter' => [
-                        'type' => 'none',
-                    ],
-                ],
-                'active' => [
                     'filter' => [
                         'type' => 'none',
                     ],

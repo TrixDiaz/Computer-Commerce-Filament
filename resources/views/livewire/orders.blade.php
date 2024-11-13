@@ -1,13 +1,11 @@
 <div class="antialiased max-w-screen-xl px-4 mx-auto 2xl:px-0 py-4">
     <h2 class="text-2xl font-semibold mb-4">Your Orders</h2>
-
     @if($orders->isEmpty())
     <p class="text-gray-600">You don't have any orders yet.</p>
-    @else@
+    @else
     <table class="min-w-full bg-white border border-gray-300">
         <thead>
             <tr>
-            
                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Order Number
                 </th>
@@ -31,7 +29,6 @@
         <tbody>
             @foreach($orders as $order)
             <tr>
-               
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
                     {{ $order->order_number }}
                 </td>
@@ -58,11 +55,11 @@
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-300">
                     <button wire:click="viewOrderDetails({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-indigo-500 text-white">View</button>
                     @if($order->status !== 'completed')
-                        @if($order->payment_method === 'cod')
-                        <button wire:click="confirmCancelOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-red-500 text-white">Cancel</button>
-                        @elseif($order->payment_method === 'gcash')
-                        <button wire:click="confirmRefundOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-yellow-500 text-white">Refund</button>
-                        @endif
+                    @if($order->payment_method === 'cod')
+                    <button wire:click="confirmCancelOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-red-500 text-white">Cancel</button>
+                    @elseif($order->payment_method === 'gcash')
+                    <button wire:click="confirmRefundOrder({{ $order->id }})" class="mr-2 px-2 py-1 rounded-md bg-yellow-500 text-white">Refund</button>
+                    @endif
                     @endif
 
                     @if($order->status === 'completed')
@@ -219,7 +216,7 @@
                                 <option value="">Select Rating</option>
                                 @for ($i = 1; $i <= 5; $i++)
                                     <option value="{{ $i }}">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
-                                @endfor
+                                    @endfor
                             </select>
                             @error('rating') <span class="text-red-500">{{ $message }}</span> @enderror
                         </div>

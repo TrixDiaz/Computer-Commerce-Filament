@@ -220,8 +220,11 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('full_name')
+                    ->searchable()
+                    ->default(function (User $record) {
+                        return $record->first_name . ' ' . $record->last_name;
+                    }),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')

@@ -41,32 +41,35 @@ class MostPurchaseProductChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
-        $mostPurchasedProducts = OrderItem::selectRaw('
+        // Get the top 5 products based on the first month or cached order
+        $topProducts = OrderItem::selectRaw('
+                products.id,
                 products.name,
-                MONTH(order_items.created_at) as month,
-                SUM(order_items.quantity) as total_quantity,
-                SUM(order_items.quantity) as yearly_total
+                SUM(order_items.quantity) as total_quantity
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereYear('order_items.created_at', now()->year)
             ->where('orders.status', Order::STATUS_COMPLETED)
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('total_quantity', 'desc')
+            ->limit(5)
+            ->pluck('name')
+            ->toArray();
+
+        $mostPurchasedProducts = OrderItem::selectRaw('
+                products.name,
+                MONTH(order_items.created_at) as month,
+                SUM(order_items.quantity) as total_quantity
+            ')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->whereYear('order_items.created_at', now()->year)
+            ->where('orders.status', Order::STATUS_COMPLETED)
+            ->whereIn('products.name', $topProducts)  // Only get data for our top products
             ->groupBy('products.id', 'products.name', 'month')
             ->orderBy('month')
             ->get();
-
-        // Group and calculate yearly totals for each product
-        $yearlyTotals = [];
-        foreach ($mostPurchasedProducts as $item) {
-            if (!isset($yearlyTotals[$item->name])) {
-                $yearlyTotals[$item->name] = 0;
-            }
-            $yearlyTotals[$item->name] += $item->total_quantity;
-        }
-
-        // Get top 5 products by yearly total
-        arsort($yearlyTotals);
-        $top5Products = array_slice($yearlyTotals, 0, 5, true);
 
         $productData = [];
         $productColors = [];
@@ -78,18 +81,13 @@ class MostPurchaseProductChart extends ApexChartWidget
             4 => '#8b5cf6', // Purple
         ];
 
-        // Assign fixed colors based on product order
-        $colorIndex = 0;
-        foreach ($top5Products as $productName => $total) {
-            $productColors[$productName] = $colorMap[$colorIndex];
-            $colorIndex++;
+        // Assign colors based on the fixed top products order
+        foreach ($topProducts as $index => $productName) {
+            $productColors[$productName] = $colorMap[$index];
         }
 
         foreach ($mostPurchasedProducts as $item) {
-            // Only include data for top 5 products
-            if (isset($top5Products[$item->name])) {
-                $productData[$item->name][$item->month] = $item->total_quantity;
-            }
+            $productData[$item->name][$item->month] = $item->total_quantity;
         }
 
         $series = [];

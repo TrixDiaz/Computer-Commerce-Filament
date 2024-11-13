@@ -69,6 +69,22 @@ class MostPurchaseProductChart extends ApexChartWidget
         $top5Products = array_slice($yearlyTotals, 0, 5, true);
 
         $productData = [];
+        $productColors = [];
+        $colorMap = [
+            0 => '#f59e0b', // Orange
+            1 => '#3b82f6', // Blue
+            2 => '#10b981', // Green
+            3 => '#ef4444', // Red
+            4 => '#8b5cf6', // Purple
+        ];
+
+        // Assign fixed colors based on product order
+        $colorIndex = 0;
+        foreach ($top5Products as $productName => $total) {
+            $productColors[$productName] = $colorMap[$colorIndex];
+            $colorIndex++;
+        }
+
         foreach ($mostPurchasedProducts as $item) {
             // Only include data for top 5 products
             if (isset($top5Products[$item->name])) {
@@ -77,6 +93,7 @@ class MostPurchaseProductChart extends ApexChartWidget
         }
 
         $series = [];
+        $colors = [];
         foreach ($productData as $productName => $monthlyData) {
             $data = array_map(function($month) use ($monthlyData) {
                 return $monthlyData[$month] ?? 0;
@@ -86,6 +103,7 @@ class MostPurchaseProductChart extends ApexChartWidget
                 'name' => $productName,
                 'data' => $data,
             ];
+            $colors[] = $productColors[$productName];
         }
 
         return [
@@ -112,7 +130,7 @@ class MostPurchaseProductChart extends ApexChartWidget
                     ],
                 ],
             ],
-            'colors' => ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'], // Added more colors for multiple products
+            'colors' => $colors,
             'stroke' => [
                 'curve' => 'smooth',
             ],

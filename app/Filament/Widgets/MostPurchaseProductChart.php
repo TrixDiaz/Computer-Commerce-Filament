@@ -58,7 +58,7 @@ class MostPurchaseProductChart extends ApexChartWidget
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->groupBy('products.id', 'products.name')
             ->orderBy('order_frequency', 'desc')
-            ->limit(5)
+            ->limit(3)
             ->pluck('name')
             ->toArray();
 

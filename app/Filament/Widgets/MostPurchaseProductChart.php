@@ -44,7 +44,8 @@ class MostPurchaseProductChart extends ApexChartWidget
         $mostPurchasedProducts = OrderItem::selectRaw('
                 products.name,
                 MONTH(order_items.created_at) as month,
-                SUM(order_items.quantity) as total_quantity
+                SUM(order_items.quantity) as total_quantity,
+                SUM(order_items.quantity) as yearly_total
             ')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -54,9 +55,25 @@ class MostPurchaseProductChart extends ApexChartWidget
             ->orderBy('month')
             ->get();
 
+        // Group and calculate yearly totals for each product
+        $yearlyTotals = [];
+        foreach ($mostPurchasedProducts as $item) {
+            if (!isset($yearlyTotals[$item->name])) {
+                $yearlyTotals[$item->name] = 0;
+            }
+            $yearlyTotals[$item->name] += $item->total_quantity;
+        }
+
+        // Get top 5 products by yearly total
+        arsort($yearlyTotals);
+        $top5Products = array_slice($yearlyTotals, 0, 5, true);
+
         $productData = [];
         foreach ($mostPurchasedProducts as $item) {
-            $productData[$item->name][$item->month] = $item->total_quantity;
+            // Only include data for top 5 products
+            if (isset($top5Products[$item->name])) {
+                $productData[$item->name][$item->month] = $item->total_quantity;
+            }
         }
 
         $series = [];
